@@ -1,5 +1,5 @@
 import { ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native'
-import React, { useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import Colors from '@/constants/Colors'
 import { Stack, router } from 'expo-router'
 import { Ionicons } from '@expo/vector-icons';
@@ -32,9 +32,6 @@ const OnlineSchedule = () => {
             .catch((e) => alert(e))
             .finally(() => setLoading(false))
     }
-
-
-
 
     useEffect(() => {
         getOnlineLessons()
@@ -74,7 +71,7 @@ const OnlineSchedule = () => {
                     : <ScrollView
                         showsVerticalScrollIndicator={false}
                         style={{ flex: 1 }}
-                        contentContainerStyle={{ paddingTop: 20, paddingBottom: insets.bottom + 10 }}>
+                        contentContainerStyle={{ paddingTop: 20, paddingBottom: insets.bottom + 40 }}>
                         {
                             Object.keys(lessons).map((item: any, i: number) => (
                                 <Animated.View key={i} entering={FadeInUp.delay(i*150)}>

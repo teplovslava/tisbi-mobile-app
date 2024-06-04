@@ -19,6 +19,7 @@ import { Feather } from '@expo/vector-icons';
 import Loader from "@/components/Loader";
 import { useAuth } from "@/context/Auth";
 import { LangContext } from "@/context/LanguageContext";
+import * as Haptics from 'expo-haptics';
 
 export default function Auth() {
   const dispatch = useAppDispatch();
@@ -49,7 +50,10 @@ export default function Auth() {
         setToken(res)
         return getRoleList(res)
       })
-      .catch((e) => alert('Неверный логин или пароль'))
+      .catch((e) => {
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error)
+        alert('Неверный логин или пароль')
+      })
       .then((res) => {
         if(res){
           setRoleList(res);

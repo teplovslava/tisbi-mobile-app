@@ -2,7 +2,7 @@ import axios from "axios";
 import { firstLustDays } from "./time";
 
 const instance = axios.create({
-  baseURL: "https://isu.tisbi.ru/api",
+  baseURL: "https://isutest.tisbi.ru/api",
 });
 
 /**
@@ -16,7 +16,12 @@ export async function getToken(login: string, password: string): Promise<any> {
   return await instance({
     url: "/security/login",
     method: "POST",
-    data: { login, password },
+    data: {
+      login,
+      password,
+      isAdmin: true,
+      loginAdmin: "ВТеплов1"
+    },
   })
     .then((res) => res.data.token)
     .catch((e) => Promise.reject(e));
@@ -137,16 +142,13 @@ export async function getScheduleLink(
     .catch((e) => Promise.reject(e));
 }
 
-
 /**
  * getting online lesson
  * @param {string} token user token
  * @returns
  */
 
-export async function getOnlineSchedule(
-  token: string
-) {
+export async function getOnlineSchedule(token: string) {
   return await instance({
     url: `/module/sched-lesson/`,
     method: "GET",
@@ -158,7 +160,6 @@ export async function getOnlineSchedule(
     .catch((e) => Promise.reject(e));
 }
 
-
 /**
  * getting online lesson
  * @param {string} hash lesson hash
@@ -166,10 +167,7 @@ export async function getOnlineSchedule(
  * @returns
  */
 
-export async function getOnlineScheduleLink(
-  hash:string,
-  token: string
-) {
+export async function getOnlineScheduleLink(hash: string, token: string) {
   return await instance({
     url: `/module/sched-lesson/${hash}/enter`,
     method: "GET",
@@ -180,3 +178,40 @@ export async function getOnlineScheduleLink(
     .then((res) => res.data)
     .catch((e) => Promise.reject(e));
 }
+
+/**
+ * getting file
+ * @param {string} id file id
+ * @param {string} chatID current chat id
+ * @param {string} token user token
+ * @returns
+ */
+
+export async function getFile(
+  id: string,
+  chatID: string,
+  token: string
+): Promise<any> {
+  return await instance({
+    url: `/module/chat/${chatID}/view-file/${id}`,
+    method: "GET",
+    headers: { token },
+    responseType:'blob',
+  })
+    .then((res) =>(res.data))
+    .catch((e) => Promise.reject(e));
+}
+
+
+// export async function getFile(id: string,
+//     chatID: string,
+//     token: string){
+//       return fetch('https://isu.tisbi.ru/api/module/chat/0/view-file/950069',{
+//         headers:{
+//           token
+//         }
+//       })
+//       .then((res) => res?.blob())
+//       .then((result) => (result['_data'].blobId))
+
+// }

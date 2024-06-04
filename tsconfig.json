@@ -15,5 +15,5 @@
     "**/*.jsx",
     ".expo/types/**/*.ts",
     "expo-env.d.ts"
-  ]
+, "service/filterSchedule.ts", "service/groupsNormalize.ts", "service/onlineLessonsNormalize.ts"  ]
 }

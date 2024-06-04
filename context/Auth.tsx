@@ -13,9 +13,9 @@ function useProtectedRoute(user: any) {
   const segments = useSegments();
 
   React.useEffect(() => {
-    const inAuthGroup = segments[0] === "(root)";
+    const inAuthGroup = segments[0] === "(tabs)";
     if ( user && !inAuthGroup ) {
-      router.replace("/(root)/main");
+      router.replace("/(tabs)/(main)");
     } else if (!user && inAuthGroup) {
       router.replace("/");
     }
