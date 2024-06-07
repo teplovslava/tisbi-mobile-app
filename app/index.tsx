@@ -129,7 +129,12 @@ export default function Auth() {
           </View>
         </View>
       </KeyboardAvoidingView>
-      <BottomSheetContainer index={-1} refer={bottomSheetRef} style={{ borderRadius: 40, overflow: "hidden" }} containerStyle={{ margin: 20, borderRadius: 40, marginBottom: insets.bottom + 10, }} handleIndicatorStyle={{ display: "none" }}
+      <BottomSheetContainer 
+      index={-1} refer={bottomSheetRef} 
+      style={{ borderRadius: 40, overflow: "hidden" }} 
+      containerStyle={{ margin: 20, borderRadius: 40, marginBottom: insets.bottom + 10, }} 
+      handleIndicatorStyle={{ display: "none" }}
+      scrollable
         backdropComponent={(props: any) => (
           <Backdrop {...props} opacity={0.7} pressBehavior={false} disappearsOnIndex={-1} appearsOnIndex={0} />
         )}

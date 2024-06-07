@@ -16,6 +16,7 @@ const BottomSheetContainer = ({refer, children,scrollable = false,dynamic=true, 
     <BottomSheet ref={refer}
         {...props}
         enableDynamicSizing={dynamic}>
+
        <BottomSheetScrollView scrollEnabled={scrollable}> 
            {children}
        </BottomSheetScrollView>

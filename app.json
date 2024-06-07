@@ -1,12 +1,13 @@
 {
   "expo": {
-    "name": "schedule-tisbi",
+    "name": "ЛК Студента",
     "slug": "schedule-tisbi",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "myapp",
     "userInterfaceStyle": "automatic",
+    "backgroundColor": "#000000",
     "splash": {
       "image": "./assets/images/splash.png",
       "resizeMode": "contain",

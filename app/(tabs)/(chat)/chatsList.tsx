@@ -32,6 +32,7 @@ const ChatsList = () => {
         headerTitleStyle: { color: Colors.white },
         headerShadowVisible: false,
         headerBackTitleVisible: false,
+        headerBackVisible:false,
         headerLeft: (props) => (
           <TouchableOpacity onPress={() => {
             router.back()

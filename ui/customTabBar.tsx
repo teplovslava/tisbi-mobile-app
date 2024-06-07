@@ -1,4 +1,4 @@
-import { TouchableOpacity, View, Text, StyleSheet } from "react-native";
+import { TouchableOpacity, View, Text, StyleSheet, Platform } from "react-native";
 
 import { BottomTabBarProps } from "@react-navigation/bottom-tabs";
 import { useContext, useState } from "react";
@@ -41,7 +41,7 @@ const TabBar = (props: IProps) => {
 
   return (
     <Animated.View style={[styles.container, bottomStyle]}>
-    <BlurView intensity={20} style={[styles.blur,{paddingBottom: insets.bottom}]} >
+    <BlurView experimentalBlurMethod="dimezisBlurView" intensity={Platform.OS === 'ios' ? 20 : 2} style={[styles.blur,{paddingBottom: insets.bottom}]} >
       {state.routes.map((route, index) => {
         const { options } = descriptors[route.key];
 
@@ -110,8 +110,7 @@ const styles = StyleSheet.create({
     flexDirection:'row',
     alignItems:'center',
     justifyContent:'space-around',
-    backgroundColor:'rgba(0,0,0,0.75)',
-    marginBottom:-5,
+    backgroundColor:'rgba(0,0,0,.75)',
     paddingTop:10
   },
   // background: {

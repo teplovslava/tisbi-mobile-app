@@ -18,12 +18,18 @@ import DeletedMessage from '@/ui/deletedMessage'
 import { IAnsweredMessage } from '@/interface'
 import * as DocumentPicker from 'expo-document-picker';
 import * as FileSystem from 'expo-file-system';
+import Backdrop from '@/components/Backdrop'
+import OnlineUser from '@/ui/onlineUser'
+import BottomSheet, { BottomSheetBackdrop, BottomSheetScrollView, BottomSheetView } from '@gorhom/bottom-sheet';
+import OnlineUsers from '@/ui/onlineUsers'
 
 
 const chatWindow = () => {
     const insets = useSafeAreaInsets()
 
     const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+    const onlineUserBottomSheetRef = useRef<BottomSheet | null>(null);
 
     const [loading, setLoading] = useState(true)
     const actionListPosition = useSharedValue({ state: false, x: 0, y: 0 })
@@ -44,6 +50,9 @@ const chatWindow = () => {
     const answeredMessage = socket?.answeredMessage
     const chatList = socket?.chatList
     const setChatList = socket?.setChatList
+    const setFixed = socket?.setFixed
+
+
     // const fixed = socket?.fixed
     // const setFixed = socket?.setFixed
 
@@ -53,8 +62,6 @@ const chatWindow = () => {
 
     const { info } = useLocalSearchParams()
     const chat = JSON.parse(info as string)
-
-
 
     const scrollToMessage = useCallback((id: string) => {
         const idx = messages?.findIndex((message) => String(message.ID) === String(id));
@@ -86,8 +93,7 @@ const chatWindow = () => {
 
     const setEdit = () => {
         setEditMode(true)
-        console.log(currentPressedMessage)
-        chatInputRef.current?.setNativeProps({text:currentPressedMessage?.Msg})
+        chatInputRef.current?.setNativeProps({ text: currentPressedMessage?.Msg })
         chatInputRef.current?.focus()
         actionListPosition.value = {
             state: false,
@@ -97,11 +103,10 @@ const chatWindow = () => {
     }
 
     const sendEditMessage = (message: string) => {
-        console.log(message)
         if (message.trim()) {
             currentMessage.current = message
             ws?.send(JSON.stringify({
-                type: 'msg-edit' ,
+                type: 'msg-edit',
                 chatId: chat.chat.ID,
                 id: currentPressedMessage?.MsgSourceID,
                 message,
@@ -339,28 +344,36 @@ const chatWindow = () => {
 
     useEffect(() => {
         if (currentChat && prevChat) {
-            currentChat.current = chat.chat.ID
-            prevChat.current = chat.chat.ID
+            currentChat.current = chat.chat.ID;
+            prevChat.current = chat.chat.ID;
         }
-
+    
         ws?.send(JSON.stringify({
             type: 'member-list',
             chatId: chat.chat.ID
-        }))
+        }));
         ws?.send(JSON.stringify({
             type: 'chat-history',
             chatId: chat.chat.ID
-        }))
-
+        }));
+    
         return () => {
-            setHistory && setHistory(null)
-            currentChat.current = ''
-        }
-    }, [])
+            setHistory && setHistory(null);
+            setFixed(null)
+            currentMessage.current = null; // Очистить текущее сообщение
+            answeredMessage.current = null; // Очистить отвеченное сообщение
+            setChoosedMessage([]); // Очистить выбранные сообщения
+            setCurrentPressedMessage(null); // Очистить текущее нажатое сообщение
+            setEditMode(false); // Сбросить режим редактирования
+            setChooseMode(false); // Сбросить режим выбора сообщений
+            setScrolledMessageID(null); // Сбросить ID прокрученного сообщения
+            // Другие необходимые очистки состояний, если есть
+        };
+    }, []);
 
     useEffect(() => {
         if (messages) {
-            setLoading(false)
+            setLoading(false);
             if (setChatList) {
                 setChatList((prev: any) => {
                     const newValue = prev.chats.map((chat: any) => {
@@ -371,19 +384,17 @@ const chatWindow = () => {
                                     ...chat.chat,
                                     UnreadCnt: 0
                                 }
-                            }
+                            };
                         } else {
-                            return chat
+                            return chat;
                         }
-                    })
-
-                    return { chats: newValue }
-                })
+                    });
+    
+                    return { chats: newValue };
+                });
             }
         }
-
-        console.log(history)
-    }, [messages, history])
+    }, [messages, history]);
 
     const actionList = [
         {
@@ -429,7 +440,7 @@ const chatWindow = () => {
     ]
 
     return (
-        <>
+        <View style={{flex:1,backgroundColor: Colors.dark }}>
             <Animated.View style={[hintStyleOverlay, { position: 'absolute', backgroundColor: 'rgba(0,0,0,0.25)', width: '100%', height: '100%', overflow: 'hidden', }]}>
                 <TouchableOpacity activeOpacity={1} onPress={overlayClick} style={{ width: '100%', height: '100%' }}>
                     <BlurView intensity={15} style={{ width: '100%', height: '100%', position: 'relative' }}>
@@ -451,6 +462,7 @@ const chatWindow = () => {
             </Animated.View>
 
             <Stack.Screen options={{
+                
                 headerShown: true,
                 headerTitleAlign: 'center',
                 headerTitle: (props) => (<View style={{ flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: 230 }}>
@@ -461,9 +473,13 @@ const chatWindow = () => {
                 headerTitleStyle: { color: Colors.white },
                 headerShadowVisible: false,
                 headerBackTitleVisible: false,
+                headerBackVisible:false,
                 headerBlurEffect: 'dark',
                 headerRight: (props) => (
-                    <TouchableOpacity>
+                    <TouchableOpacity onPress={() => {
+                        Keyboard.dismiss()
+                        onlineUserBottomSheetRef.current?.collapse()
+                    }}>
                         <Feather name="more-horizontal" size={30} color="white" />
                     </TouchableOpacity>
                 ),
@@ -474,10 +490,10 @@ const chatWindow = () => {
                 ),
             }}
             />
-            <GestureHandlerRootView style={{ flex: 1 }}>
+            <GestureHandlerRootView style={{ flex: 1, backgroundColor: Colors.secondaryDark, }}>
                 <KeyboardAvoidingView
                     behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-                    keyboardVerticalOffset={65}
+                    keyboardVerticalOffset={Platform.OS === 'ios' ? 60 : 87}
                     style={{ flex: 1, backgroundColor: Colors.secondaryDark, position: 'relative' }}>
                     {
                         loading
@@ -485,7 +501,7 @@ const chatWindow = () => {
                                 <Loader />
                             </View>
                             : Boolean(messages?.length)
-                                ? <>
+                                ? <View style={{backgroundColor: Colors.secondaryDark, flex:1}}>
                                     {
                                         history?.fixed && <TouchableOpacity onPress={() => scrollToMessage(history?.fixed.ID)} style={{ borderTopColor: 'black', borderTopWidth: 1, padding: 15, paddingVertical: 5, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 10 }}>
                                             <AntDesign style={{ flexGrow: 0, flexShrink: 0 }} name="pushpino" size={20} color={Colors.white} />
@@ -531,7 +547,7 @@ const chatWindow = () => {
 
                                         }}
                                     />
-                                </>
+                                </View>
                                 : <View style={{ backgroundColor: Colors.dark, flex: 1, flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
                                     <SText size={Sizes.bold} textStyle={{ color: Colors.grey, fontSize: 16 }}>Сообщений пока нет</SText>
                                 </View>
@@ -544,6 +560,7 @@ const chatWindow = () => {
 
                         <Animated.View style={[buttonsFiledStyle, { flexDirection: 'row', paddingTop: 7, paddingBottom: 5, paddingHorizontal: 15, alignItems: 'center', gap: 10, justifyContent: 'center', position: 'absolute' }]}>
                             <TouchableOpacity style={[styles.helperBtn]} onPress={() => {
+                                
                                 setChooseMode(false)
                                 clearAnsweredMessages()
                             }}><SText textStyle={[styles.helperBtnText, { color: 'red' }]} size={Sizes.normal}>Отменить</SText></TouchableOpacity>
@@ -575,9 +592,33 @@ const chatWindow = () => {
 
 
                     </View>
+
                 </KeyboardAvoidingView>
+                <BottomSheet
+                    index={-1}
+                    onChange={(idx) => {
+                        if(idx === -1){
+                            Keyboard.dismiss()
+                        }
+                    }}
+                    backgroundStyle={{backgroundColor:'#161616'}}
+                    snapPoints={['50%','95%']}
+                    enablePanDownToClose
+                    ref={onlineUserBottomSheetRef}
+                    style={{ borderRadius: 40, overflow: "hidden", backgroundColor: '#161616'}}
+                    containerStyle={{ borderRadius: 40}}
+                    backdropComponent={(props: any) => (
+                        <Backdrop  {...props} opacity={0.8} disappearsOnIndex={-1} appearsOnIndex={0} />)}
+                    handleIndicatorStyle={{}}>
+                    <BottomSheetView>
+                        <OnlineUsers ref={onlineUserBottomSheetRef}/>
+                    </BottomSheetView>
+                </BottomSheet>
+
+
             </GestureHandlerRootView>
-        </>
+
+        </View>
     )
 }
 
@@ -600,6 +641,6 @@ const styles = StyleSheet.create({
         justifyContent: 'flex-start',
         gap: 15,
         paddingHorizontal: 15,
-        marginTop: 7
+        marginTop: 7, 
     }
 })

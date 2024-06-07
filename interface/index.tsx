@@ -79,6 +79,8 @@ export interface IWebSocketContext {
   chatList:IChatList | null,
   history:IHistory | null,
   fixed:any,
+  connectedMembers:any,
+  member:IMember | null,
   setHistory: Dispatcher<IHistory | null>,
   setChatList: Dispatcher<IChatList | null>,
   currentChat: any,

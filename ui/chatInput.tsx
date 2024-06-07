@@ -27,7 +27,7 @@ const ChatInput = ({reff, handler, disabled }:
                 style={styles.input}
             />
             <Animated.View style={animatedStyles}>
-                <TouchableOpacity disabled={disabled}  onPress={() => {handler(value); setValue('')}} style={{ borderRadius: 50, backgroundColor: Colors.blue, padding: 7, opacity:disabled ? 0.5 : 1 }}>
+                <TouchableOpacity disabled={disabled}  onPress={() => {handler(value); setValue('')}} style={{ borderRadius: 50, backgroundColor: Colors.blue, padding: 9, opacity:disabled ? 0.5 : 1 }}>
                     <Ionicons name="send" size={20} color={Colors.white} />
                 </TouchableOpacity>
             </Animated.View>

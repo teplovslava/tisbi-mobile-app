@@ -1,10 +1,13 @@
 import { StyleSheet, Text, View } from 'react-native'
 import React from 'react'
 import { Stack } from 'expo-router'
+import Colors from '@/constants/Colors'
 
 const Layout = () => {
   return (
-    <Stack />
+    <View style={{flex:1,backgroundColor: Colors.dark }}>
+      <Stack />
+    </View>
   )
 }
 

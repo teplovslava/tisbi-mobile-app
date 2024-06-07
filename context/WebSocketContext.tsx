@@ -20,6 +20,8 @@ export const WebsocketProvider = ({ children, token }: IProps) => {
     const [userList, setUserList] = useState<IUserList | null>(null)
     const [member, setMember] = useState<IMember | null>(null)
     const [history, setHistory] = useState<IHistory | null>(null)
+    const [connectedMembers, setConnectedMembers] = useState<any>([])
+
 
     const [fixed, setFixed] = useState(null)
     const currentChat = useRef('')
@@ -62,26 +64,40 @@ export const WebsocketProvider = ({ children, token }: IProps) => {
 
                 case 'chat-history':
                     setHistory((prev: any) => {
-                        let newValue = value?.messages ? value.messages : []
-                        let newPrev = prev?.messages ? prev.messages : []
-                        if (prev) {
-                            return {
-                                ...prev,
-                                messages: [...newValue, ...newPrev]
-                            }
-                        } else {
-                            // console.log(value)
-                            // // const newValue = {...value, messages: [...value.messages,...value.newMessages]}
+                        if (currentChat.current != value.messages[0].ChatID) {
                             return { ...value, messages: [...value.messages, ...value.newMessages] }
+                        } else {
+                            let newValue = value?.messages ? value.messages : []
+                            let newPrev = prev?.messages ? prev.messages : []
+                            if (prev) {
+                                return {
+                                    ...prev,
+                                    messages: [...newValue, ...newPrev]
+                                }
+                            } else {
+                                // console.log(value)
+                                // // const newValue = {...value, messages: [...value.messages,...value.newMessages]}
+                                return { ...value, messages: [...value.messages, ...value.newMessages] }
+                            }
                         }
+
                     })
                     break;
 
                 case 'chat-list':
+
                     setChatList(value)
                     break;
 
                 case 'user-list':
+                    setConnectedMembers((prev: any) => {
+                        return value.users.map((user: any) => {
+                            return {
+                                user: user.roleId,
+                                userName: user.userName
+                            }
+                        })
+                    })
                     setUserList(value)
                     break;
 
@@ -91,6 +107,7 @@ export const WebsocketProvider = ({ children, token }: IProps) => {
 
                 case 'new-msg':
                     if (currentChat.current) {
+                        console.log("New message received:", value);
                         setHistory((prev: any) => {
                             let newPrev = prev?.messages ? prev.messages : []
                             if (prev) {
@@ -193,41 +210,54 @@ export const WebsocketProvider = ({ children, token }: IProps) => {
                     if (value.ChatID === currentChat.current) {
                         if (value.fixed) {
                             setHistory((prev: any) => {
-                                return {...prev, fixed: value.fixed}
+                                return { ...prev, fixed: value.fixed }
                             })
-                        }else{
+                        } else {
                             setHistory((prev: any) => {
-                                return {...prev, fixed: null}
+                                return { ...prev, fixed: null }
                             })
                         }
                     }
                     break
 
                 case 'msg-edit':
-                    setHistory((prev:any) => {
+                    setHistory((prev: any) => {
                         const messages = prev?.messages || []
                         const fixed = prev?.fixed
-                        const idx = messages?.findIndex((mess:any) => String(mess.ID) === String(value.ID))
+                        const idx = messages?.findIndex((mess: any) => String(mess.ID) === String(value.ID))
                         const isFixed = String(fixed.ID) === String(value.ID)
-                        if(idx !== undefined && idx >= 0){
+                        if (idx !== undefined && idx >= 0) {
                             messages[idx] = {
-                                ...messages[idx], 
-                                Msg:value.Msg,
-                                
+                                ...messages[idx],
+                                Msg: value.Msg,
+
                             }
                         }
 
 
                         return {
                             ...prev,
-                            fixed: isFixed ? {...prev.fixed, Msg:value.Msg} : {...prev.fixed},
+                            fixed: isFixed ? { ...prev.fixed, Msg: value.Msg } : { ...prev.fixed },
                             messages
                         }
                     })
 
                     break
-    
-    
+
+                case 'new-connect':
+                    setConnectedMembers((prev: any) => {
+                        return [...prev, { user: value.user, userName: value.userName }]
+                    })
+                    break
+
+                case 'close-connect':
+                    setConnectedMembers((prev: any) => {
+                        const currentUser = prev.filter((user: any) => user.user !== value.user)
+                        return currentUser
+
+                    })
+                    break
+
                 default:
                     console.log(value)
             }
@@ -243,7 +273,7 @@ export const WebsocketProvider = ({ children, token }: IProps) => {
         return () => {
             ws?.current?.close()
         }
-    }, [])
+    }, [webSocketConnect, ws])
 
     const socketValue = {
         ws: ws.current,
@@ -251,6 +281,8 @@ export const WebsocketProvider = ({ children, token }: IProps) => {
         isReady,
         chatList,
         fixed,
+        member,
+        connectedMembers,
         setFixed,
         setHistory,
         setChatList,
@@ -265,7 +297,4 @@ export const WebsocketProvider = ({ children, token }: IProps) => {
             {children}
         </WebsocketContext.Provider>
     )
-
 }
-
-
