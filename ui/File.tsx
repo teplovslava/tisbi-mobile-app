@@ -29,7 +29,7 @@ export const FileView = ({ isChooseMode, file }: {isChooseMode:boolean, file: st
         // getFile(id, currentChat.current, token)
 
         // .then((res) => {
-
+        //     console.log(res)
            
         //     // Linking.openURL(URL.createObjectURL(res))
         //     // generateExcel(res, name, format)
@@ -50,7 +50,7 @@ export const FileView = ({ isChooseMode, file }: {isChooseMode:boolean, file: st
                 <SText size={Sizes.bold} textStyle={{ color: 'white', position: 'absolute', left: 0, top: 20, width: '100%', textAlign: 'center', fontSize: 10 }}>{format}</SText>
             </View>
             <SText numberOfLines={3} size={Sizes.normal} textStyle={{ fontSize: 14, color: '#fff', flexGrow:1, flexShrink:1}}>{name}</SText>
-            {isLoading ? <ActivityIndicator size={"small"}/> : <View style={{width:20, height:20}}></View>}
+            {isLoading ? <ActivityIndicator size="small"/> : <View style={{width:20, height:20}}></View>}
 
         </TouchableOpacity>
     )

@@ -25,6 +25,7 @@ const ChatInput = ({reff, handler, disabled }:
                 multiline
                 placeholder={disabled ? 'Чат не активен' : 'Сообщение'}
                 style={styles.input}
+                placeholderTextColor="#333"
             />
             <Animated.View style={animatedStyles}>
                 <TouchableOpacity disabled={disabled}  onPress={() => {handler(value); setValue('')}} style={{ borderRadius: 50, backgroundColor: Colors.blue, padding: 9, opacity:disabled ? 0.5 : 1 }}>

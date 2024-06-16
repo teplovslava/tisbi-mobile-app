@@ -35,6 +35,7 @@ const chatWindow = () => {
     const actionListPosition = useSharedValue({ state: false, x: 0, y: 0 })
     const [isChooseMode, setChooseMode] = useState(false)
     const [choosedMessage, setChoosedMessage] = useState([])
+    const [isHalfExpanded, setIsHalfExpanded] = useState(true);
     const [currentPressedMessage, setCurrentPressedMessage] = useState<IAnsweredMessage & { isMyMessage: boolean } | null>(null)
     const [scrolledMessageID, setScrolledMessageID] = useState<number | null>(0)
     const [isEditMode, setEditMode] = useState(false)
@@ -44,6 +45,7 @@ const chatWindow = () => {
     const socket = useContext(WebsocketContext)
     const ws = socket?.ws
     const history = socket?.history
+    const isReady = socket?.isReady
     const messages = history?.messages
     const setHistory = socket?.setHistory
     const currentMessage = socket?.currentMessage
@@ -342,34 +344,38 @@ const chatWindow = () => {
         chatInputRef.current?.focus()
     }, [chatInputRef])
 
+    const handleSheetChange = (index:number) => {
+        if (index === 1) {
+          setIsHalfExpanded(true);
+        } else {
+          setIsHalfExpanded(false);
+        }
+      };
+
     useEffect(() => {
         if (currentChat && prevChat) {
             currentChat.current = chat.chat.ID;
             prevChat.current = chat.chat.ID;
         }
     
-        ws?.send(JSON.stringify({
-            type: 'member-list',
-            chatId: chat.chat.ID
-        }));
-        ws?.send(JSON.stringify({
-            type: 'chat-history',
-            chatId: chat.chat.ID
-        }));
+        if(ws?.readyState){
+            ws?.send(JSON.stringify({
+                type: 'member-list',
+                chatId: chat.chat.ID
+            }));
+            ws?.send(JSON.stringify({
+                type: 'chat-history',
+                chatId: chat.chat.ID
+            }));
+        }
     
         return () => {
             setHistory && setHistory(null);
             setFixed(null)
-            currentMessage.current = null; // Очистить текущее сообщение
-            answeredMessage.current = null; // Очистить отвеченное сообщение
-            setChoosedMessage([]); // Очистить выбранные сообщения
-            setCurrentPressedMessage(null); // Очистить текущее нажатое сообщение
-            setEditMode(false); // Сбросить режим редактирования
-            setChooseMode(false); // Сбросить режим выбора сообщений
-            setScrolledMessageID(null); // Сбросить ID прокрученного сообщения
-            // Другие необходимые очистки состояний, если есть
+            currentChat.current = null
         };
-    }, []);
+    }, [ws,ws?.readyState]);
+
 
     useEffect(() => {
         if (messages) {
@@ -439,6 +445,15 @@ const chatWindow = () => {
         }
     ]
 
+    //     if (!ws?.readyState) {
+    //     return (
+    //         <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.dark }}>
+    //             <Text style={{ color: Colors.white }}>Подключение...</Text>
+    //         </View>
+    //     );
+    // }
+
+    console.log(messages)
     return (
         <View style={{flex:1,backgroundColor: Colors.dark }}>
             <Animated.View style={[hintStyleOverlay, { position: 'absolute', backgroundColor: 'rgba(0,0,0,0.25)', width: '100%', height: '100%', overflow: 'hidden', }]}>
@@ -467,7 +482,10 @@ const chatWindow = () => {
                 headerTitleAlign: 'center',
                 headerTitle: (props) => (<View style={{ flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: 230 }}>
                     <SText numberOfLines={1} textStyle={{ fontSize: 18, color: Colors.white, width: '100%', }} size={Sizes.normal}>{chat.chat.GroupName}</SText>
-                    <SText numberOfLines={1} textStyle={{ fontSize: 12, color: '#505050', width: '100%', textAlign: 'center' }} size={Sizes.normal}>{chat.chat.ChatName}</SText>
+                    {
+                        !isReady ? <SText numberOfLines={1} textStyle={{ fontSize: 12, color: '#505050', width: '100%', textAlign: 'center' }} size={Sizes.normal}>Connection...</SText>
+                                : <SText numberOfLines={1} textStyle={{ fontSize: 12, color: '#505050', width: '100%', textAlign: 'center' }} size={Sizes.normal}>{chat.chat.ChatName}</SText>
+                    }
                 </View>),
                 headerStyle: { backgroundColor: '#161616' },
                 headerTitleStyle: { color: Colors.white },
@@ -496,7 +514,7 @@ const chatWindow = () => {
                     keyboardVerticalOffset={Platform.OS === 'ios' ? 60 : 87}
                     style={{ flex: 1, backgroundColor: Colors.secondaryDark, position: 'relative' }}>
                     {
-                        loading
+                        loading || !isReady
                             ? <View style={{ backgroundColor: Colors.dark, flex: 1, flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
                                 <Loader />
                             </View>
@@ -582,7 +600,7 @@ const chatWindow = () => {
                                 </TouchableOpacity> */}
                                 <ChatInput
                                     reff={chatInputRef}
-                                    disabled={Number(new Date(chat.chat.DateEnd)) < Number(new Date())}
+                                    disabled={Number(new Date(chat.chat.DateEnd)) < Number(new Date()) || !isReady}
                                     handler={isEditMode ? sendEditMessage : sendMessage}
                                 />
                             </View>
@@ -600,6 +618,8 @@ const chatWindow = () => {
                         if(idx === -1){
                             Keyboard.dismiss()
                         }
+                        handleSheetChange(idx)
+                        
                     }}
                     backgroundStyle={{backgroundColor:'#161616'}}
                     snapPoints={['50%','95%']}
@@ -611,7 +631,7 @@ const chatWindow = () => {
                         <Backdrop  {...props} opacity={0.8} disappearsOnIndex={-1} appearsOnIndex={0} />)}
                     handleIndicatorStyle={{}}>
                     <BottomSheetView>
-                        <OnlineUsers ref={onlineUserBottomSheetRef}/>
+                        <OnlineUsers isHalfExpanded={isHalfExpanded} ref={onlineUserBottomSheetRef}/>
                     </BottomSheetView>
                 </BottomSheet>
 

@@ -2,7 +2,7 @@ import axios from "axios";
 import { firstLustDays } from "./time";
 
 const instance = axios.create({
-  baseURL: "https://isutest.tisbi.ru/api",
+  baseURL: "https://isu.tisbi.ru/api",
 });
 
 /**
@@ -19,8 +19,8 @@ export async function getToken(login: string, password: string): Promise<any> {
     data: {
       login,
       password,
-      isAdmin: true,
-      loginAdmin: "ВТеплов1"
+      // isAdmin: true,
+      // loginAdmin: "ВТеплов1"
     },
   })
     .then((res) => res.data.token)
@@ -196,9 +196,9 @@ export async function getFile(
     url: `/module/chat/${chatID}/view-file/${id}`,
     method: "GET",
     headers: { token },
-    responseType:'blob',
+    responseType:'blob'
   })
-    .then((res) =>(res.data))
+    .then((res) => res.data)
     .catch((e) => Promise.reject(e));
 }
 

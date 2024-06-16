@@ -1,6 +1,7 @@
 import { IChatList, IGroupsList, IHistory, IMember, IUserList, IWebSocketContext } from "@/interface";
 import { createContext, useCallback, useEffect, useRef, useState } from "react";
 import * as Haptics from 'expo-haptics';
+import { AppState, AppStateStatus } from "react-native";
 
 interface IProps {
     children: JSX.Element,
@@ -30,11 +31,11 @@ export const WebsocketProvider = ({ children, token }: IProps) => {
     const currentMessageId = useRef('')
     const answeredMessage = useRef([])
 
-    //1443
+    //38000
 
 
     const webSocketConnect = useCallback(() => {
-        let socket = new WebSocket(`wss://ws.tisbi.ru:38000?jwt=${token}`)
+        let socket = new WebSocket(`wss://ws.tisbi.ru:1443?jwt=${token}`)
 
         socket.onopen = () => {
             setIsReady(true)
@@ -51,6 +52,7 @@ export const WebsocketProvider = ({ children, token }: IProps) => {
 
 
         socket.onerror = () => {
+            setIsReady(false)
             socket.close()
         }
 
@@ -64,7 +66,7 @@ export const WebsocketProvider = ({ children, token }: IProps) => {
 
                 case 'chat-history':
                     setHistory((prev: any) => {
-                        if (currentChat.current != value.messages[0].ChatID) {
+                        if (currentChat.current != value.messages[0]?.ChatID) {
                             return { ...value, messages: [...value.messages, ...value.newMessages] }
                         } else {
                             let newValue = value?.messages ? value.messages : []
@@ -106,8 +108,7 @@ export const WebsocketProvider = ({ children, token }: IProps) => {
                     break;
 
                 case 'new-msg':
-                    if (currentChat.current) {
-                        console.log("New message received:", value);
+                    if (currentChat.current === prevChat.current) {
                         setHistory((prev: any) => {
                             let newPrev = prev?.messages ? prev.messages : []
                             if (prev) {
@@ -121,7 +122,6 @@ export const WebsocketProvider = ({ children, token }: IProps) => {
                         })
                     } else {
                         setChatList((prev: any) => {
-
                             const newValue = prev.chats.map((chat: any) => {
                                 if (chat.chat.ID === prevChat.current) {
                                     return {
@@ -257,6 +257,7 @@ export const WebsocketProvider = ({ children, token }: IProps) => {
 
                     })
                     break
+                
 
                 default:
                     console.log(value)
@@ -270,10 +271,23 @@ export const WebsocketProvider = ({ children, token }: IProps) => {
     useEffect(() => {
         webSocketConnect()
 
-        return () => {
-            ws?.current?.close()
-        }
-    }, [webSocketConnect, ws])
+        const handleAppStateChange = (nextAppState: AppStateStatus) => {
+            if (nextAppState === 'background') {
+              // Приложение перешло в фоновый режим
+              ws.current?.close()
+              setIsReady(false)
+            }
+          };
+      
+          const subscription = AppState.addEventListener('change', handleAppStateChange);
+      
+          return () => {
+            subscription.remove();
+          };
+
+    }, [webSocketConnect, ws,])
+
+    
 
     const socketValue = {
         ws: ws.current,
