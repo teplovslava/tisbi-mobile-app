@@ -25,6 +25,7 @@ const Settings = () => {
     const dispatch = useAppDispatch()
     const { signOut } = useAuth();
 
+
     const langList = ['Русский', 'English']
 
     return (

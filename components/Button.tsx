@@ -3,7 +3,7 @@ import React from 'react'
 import SText, { Sizes } from './StyledText'
 
 interface IProps{
-    children?:string | JSX.Element | null,
+    children?:string | JSX.Element | null | any,
     handler?:() => void,
     [x:string]: any
 }

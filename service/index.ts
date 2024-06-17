@@ -2,7 +2,7 @@ import axios from "axios";
 import { firstLustDays } from "./time";
 
 const instance = axios.create({
-  baseURL: "https://isu.tisbi.ru/api",
+  baseURL: "https://isutest.tisbi.ru/api",
 });
 
 /**
@@ -19,8 +19,8 @@ export async function getToken(login: string, password: string): Promise<any> {
     data: {
       login,
       password,
-      // isAdmin: true,
-      // loginAdmin: "ВТеплов1"
+      isAdmin: true,
+      loginAdmin: "ВТеплов1"
     },
   })
     .then((res) => res.data.token)

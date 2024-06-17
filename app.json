@@ -18,7 +18,10 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "schedule.tisbi"
+      "bundleIdentifier": "schedule.tisbi",
+      "infoPlist": {
+        "NSFaceIDUsageDescription": "This app uses FaceID to authenticate your identity for secure access."
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -35,7 +38,13 @@
     "plugins": [
       "expo-router",
       "expo-font",
-      "expo-document-picker"
+      "expo-document-picker",
+      [
+        "expo-local-authentication",
+        {
+          "faceIDPermission": "Allow $(PRODUCT_NAME) to use Face ID."
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true

@@ -1,3 +1,4 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router, useSegments } from "expo-router";
 import React from "react";
 
@@ -26,13 +27,18 @@ function useProtectedRoute(user: any) {
 export function Provider(props: any) {
   const [user, setAuth] = React.useState<any>(null);
 
+
   useProtectedRoute(user);
 
   return (
     <AuthContext.Provider
       value={{
         signIn: () => setAuth({}),
-        signOut: () => setAuth(null),
+        signOut: () => {
+          setAuth(null)
+          AsyncStorage.removeItem('user-login')
+
+        },
         user,
       }}
     >

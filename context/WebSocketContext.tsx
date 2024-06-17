@@ -31,11 +31,11 @@ export const WebsocketProvider = ({ children, token }: IProps) => {
     const currentMessageId = useRef('')
     const answeredMessage = useRef([])
 
-    //38000
+    //1443
 
 
     const webSocketConnect = useCallback(() => {
-        let socket = new WebSocket(`wss://ws.tisbi.ru:1443?jwt=${token}`)
+        let socket = new WebSocket(`wss://ws.tisbi.ru:38000?jwt=${token}`)
 
         socket.onopen = () => {
             setIsReady(true)
