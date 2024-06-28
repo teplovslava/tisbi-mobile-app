@@ -4,19 +4,19 @@ async function authenticate(login:string) {
   try {
     const hasHardware = await LocalAuthentication.hasHardwareAsync();
     if (!hasHardware) {
-      console.log('No biometric hardware available');
+      // console.log('No biometric hardware available');
       return false;
     }
 
     const supportedAuthTypes = await LocalAuthentication.supportedAuthenticationTypesAsync();
     if (supportedAuthTypes.length === 0) {
-      console.log('No biometric authentication methods are supported');
+      // console.log('No biometric authentication methods are supported');
       return false;
     }
 
     const isEnrolled = await LocalAuthentication.isEnrolledAsync();
     if (!isEnrolled) {
-      console.log('No biometric authentication methods are enrolled');
+      // console.log('No biometric authentication methods are enrolled');
       return false;
     }
 
@@ -33,14 +33,14 @@ async function authenticate(login:string) {
     });
 
     if (result.success) {
-      console.log('Authenticated successfully');
+      // console.log('Authenticated successfully');
       return true;
     } else {
-      console.log('Authentication failed');
+      // console.log('Authentication failed');
       return false;
     }
   } catch (error) {
-    console.error('An error occurred during authentication', error);
+    // console.error('An error occurred during authentication', error);
     return false;
   }
 }

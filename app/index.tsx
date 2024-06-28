@@ -70,7 +70,7 @@ export default function Auth() {
         }
       })
       .catch((e) => {
-        console.log(e)
+        Alert.alert('Ошибка', String(e))
         setLoding(false)
       })
   }
@@ -81,17 +81,20 @@ export default function Auth() {
   function handleLogin(login: string, password: string) {
     Keyboard.dismiss()
     setLoding(true)
-
+    
     getToken(login, password)
+    
       .then((res) => {
         setToken(res)
         addValue('user-login', JSON.stringify({ login, password }))
+
         setSavedAuthData(login)
         return getRoleList(res)
       })
       .catch((e) => {
+        console.log(e)
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error)
-        alert('Неверный логин или пароль')
+        Alert.alert('Повторите попытку','Неверный логин или пароль')
       })
       .then((res) => {
         if (res) {
@@ -100,7 +103,7 @@ export default function Auth() {
           setOpen(true);
         }
       })
-      .catch((e) => alert('Ошибка!' + e))
+      .catch((e) => Alert.alert('Ошибка', String(e)))
       .finally(() => setLoding(false))
   }
 
@@ -114,7 +117,7 @@ export default function Auth() {
         return getHash(res, routeLink)
 
       })
-      .catch(e => alert(e))
+      .catch(e => Alert.alert('Ошибка', String(e)))
       .then(res => {
         if (res) {
           signIn()
@@ -123,7 +126,7 @@ export default function Auth() {
           setRoleList(null)
         }
       })
-      .catch(e => alert(e))
+      .catch(e => Alert.alert('Ошибка', String(e)))
       .finally(() => setLoding(false))
   }
 

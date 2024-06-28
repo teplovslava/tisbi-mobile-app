@@ -8,6 +8,8 @@ import dayjs from 'dayjs'
 import { getOnlineScheduleLink } from '@/service'
 import { useAppSelector } from '@/store/hooks'
 import { LangContext } from '@/context/LanguageContext'
+import { WebsocketContext } from '@/context/WebSocketContext'
+import { router } from 'expo-router'
 
 interface IProps{
     lesson:IOnlineLesson,
@@ -17,7 +19,8 @@ interface IProps{
 
 
 const OnlineScheduleItem = ({lesson}:IProps) => {
-
+    const socket = useContext(WebsocketContext)
+    let currentChat = socket?.currentChat 
     const [loading, setLoading] = useState<boolean>()
     const { token } = useAppSelector((store) => store.user)
     const currLang = useContext(LangContext)
@@ -28,7 +31,13 @@ const OnlineScheduleItem = ({lesson}:IProps) => {
         setLoading(true)
         getOnlineScheduleLink(hash, token)
             .then((res) =>{
-                Linking.openURL(res.url)
+                if(res.url){
+                    Linking.openURL(res.url)
+                }else if (res.chatId){
+                    currentChat.current = String(res.chatId);
+                    router.push({ pathname: "/(tabs)/(chat)/chatWindow", params: { id: JSON.stringify(res.chatId) } });
+                }
+                
             })
             .catch((e) => alert(e))
             .finally(() => setLoading(false))

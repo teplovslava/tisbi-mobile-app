@@ -14,6 +14,7 @@ interface IProps{
 const BottomSheetContainer = ({refer, children,scrollable = false,dynamic=true, ...props}: IProps) => {
   return (
     <BottomSheet ref={refer}
+
         {...props}
         enableDynamicSizing={dynamic}>
 

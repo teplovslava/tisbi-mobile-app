@@ -1,5 +1,5 @@
 import { Alert, FlatList, KeyboardAvoidingView, Keyboard, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
-import React, { useCallback, useContext, useEffect, useRef, useState } from 'react'
+import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
 import { WebsocketContext } from '@/context/WebSocketContext'
 import { Stack, router, useLocalSearchParams } from 'expo-router'
 import SText, { Sizes } from '@/components/StyledText'
@@ -15,13 +15,18 @@ import Loader from '@/components/Loader'
 import * as Haptics from 'expo-haptics';
 import AnsweredMessage from '@/ui/answeredMessage'
 import DeletedMessage from '@/ui/deletedMessage'
-import { IAnsweredMessage } from '@/interface'
+import { IAnsweredMessage, IChat, IMessage } from '@/interface'
 import * as DocumentPicker from 'expo-document-picker';
 import * as FileSystem from 'expo-file-system';
 import Backdrop from '@/components/Backdrop'
-import OnlineUser from '@/ui/onlineUser'
 import BottomSheet, { BottomSheetBackdrop, BottomSheetScrollView, BottomSheetView } from '@gorhom/bottom-sheet';
 import OnlineUsers from '@/ui/onlineUsers'
+import { normalizeAnsweredMessage } from '@/service/normalizeAnsweredMessage'
+import { FileView } from '@/ui/File'
+import dayjs from 'dayjs'
+import * as Clipboard from 'expo-clipboard';
+
+
 
 
 const chatWindow = () => {
@@ -36,7 +41,7 @@ const chatWindow = () => {
     const [isChooseMode, setChooseMode] = useState(false)
     const [choosedMessage, setChoosedMessage] = useState([])
     const [isHalfExpanded, setIsHalfExpanded] = useState(true);
-    const [currentPressedMessage, setCurrentPressedMessage] = useState<IAnsweredMessage & { isMyMessage: boolean } | null>(null)
+    const [currentPressedMessage, setCurrentPressedMessage] = useState<IAnsweredMessage & { isMyMessage: boolean, message: any } | null>(null)
     const [scrolledMessageID, setScrolledMessageID] = useState<number | null>(0)
     const [isEditMode, setEditMode] = useState(false)
     const flatListRef = useRef<FlatList>(null)
@@ -62,8 +67,10 @@ const chatWindow = () => {
     const prevChat = socket?.prevChat
 
 
-    const { info } = useLocalSearchParams()
-    const chat = JSON.parse(info as string)
+    const { id } = useLocalSearchParams()
+    const chatId = JSON.parse(id as string)
+    const chat = chatList?.chats?.filter((chatItem: IChat) => String(chatItem.chat.ID) === id) || []
+
 
     const scrollToMessage = useCallback((id: string) => {
         const idx = messages?.findIndex((message) => String(message.ID) === String(id));
@@ -109,7 +116,7 @@ const chatWindow = () => {
             currentMessage.current = message
             ws?.send(JSON.stringify({
                 type: 'msg-edit',
-                chatId: chat.chat.ID,
+                chatId: chatId,
                 id: currentPressedMessage?.MsgSourceID,
                 message,
                 files: [],
@@ -127,7 +134,7 @@ const chatWindow = () => {
             currentMessage.current = message
             ws?.send(JSON.stringify({
                 type: 'draft-msg',
-                chatId: chat.chat.ID,
+                chatId: chatId,
                 id: null,
                 message,
                 files: [],
@@ -153,7 +160,7 @@ const chatWindow = () => {
                 text: 'OK', onPress: () => {
                     ws?.send(JSON.stringify({
                         type: 'msg-delete',
-                        chatId: chat.chat.ID,
+                        chatId: chatId,
                         msgId: currentPressedMessage?.MsgSourceID
                     }));
                 }
@@ -164,7 +171,7 @@ const chatWindow = () => {
     const unfixMessage = (message: any) => {
         ws?.send(JSON.stringify({
             type: 'msg-fixed',
-            chatId: chat.chat.ID,
+            chatId: chatId,
             msgId: message.ID,
             msg: message.Msg,
             fix: 0
@@ -175,7 +182,7 @@ const chatWindow = () => {
     const fixMessage = () => {
         ws?.send(JSON.stringify({
             type: 'msg-fixed',
-            chatId: chat.chat.ID,
+            chatId: chatId,
             msgId: currentPressedMessage?.MsgSourceID,
             msg: currentPressedMessage?.Msg,
             fix: 1
@@ -238,7 +245,7 @@ const chatWindow = () => {
         if (messages && Number(messages[0]?.RowNum) - 1 > 1) {
             ws?.send(JSON.stringify({
                 type: 'chat-history',
-                chatId: chat.chat.ID,
+                chatId: chatId,
                 offset: Number(messages[0]?.RowNum) - 1
             }))
         }
@@ -335,6 +342,19 @@ const chatWindow = () => {
         chatInputRef.current?.focus()
     }
 
+    const copyMessageText = () => {
+        Clipboard.setStringAsync(currentPressedMessage?.Msg || '');
+        actionListPosition.value = {
+            state: false,
+            x: actionListPosition.value.x,
+            y: actionListPosition.value.y,
+        }
+    }
+
+    const reversedMessages = useMemo(() => {
+        return messages ? [...messages].reverse() : [];
+      }, [messages]);
+
     const clearAnsweredMessages = () => {
         setChoosedMessage([])
         answeredMessage.current = []
@@ -342,39 +362,40 @@ const chatWindow = () => {
 
     const openKeyboard = useCallback(() => {
         chatInputRef.current?.focus()
-    }, [chatInputRef])
+    }, [])
 
-    const handleSheetChange = (index:number) => {
+    const handleSheetChange = (index: number) => {
         if (index === 1) {
-          setIsHalfExpanded(true);
+            setIsHalfExpanded(true);
         } else {
-          setIsHalfExpanded(false);
+            setIsHalfExpanded(false);
         }
-      };
+    };
 
     useEffect(() => {
         if (currentChat && prevChat) {
-            currentChat.current = chat.chat.ID;
-            prevChat.current = chat.chat.ID;
+            currentChat.current = chatId;
+            prevChat.current = chatId;
         }
-    
-        if(ws?.readyState){
+
+        if (ws?.readyState) {
+            setLoading(true);
             ws?.send(JSON.stringify({
                 type: 'member-list',
-                chatId: chat.chat.ID
+                chatId: chatId
             }));
             ws?.send(JSON.stringify({
                 type: 'chat-history',
-                chatId: chat.chat.ID
+                chatId: chatId
             }));
         }
-    
+
         return () => {
             setHistory && setHistory(null);
             setFixed(null)
             currentChat.current = null
         };
-    }, [ws,ws?.readyState]);
+    }, [ws, ws?.readyState]);
 
 
     useEffect(() => {
@@ -383,7 +404,7 @@ const chatWindow = () => {
             if (setChatList) {
                 setChatList((prev: any) => {
                     const newValue = prev.chats.map((chat: any) => {
-                        if (chat.chat.ID === prevChat.current) {
+                        if (chatId === prevChat.current) {
                             return {
                                 ...chat,
                                 chat: {
@@ -395,7 +416,7 @@ const chatWindow = () => {
                             return chat;
                         }
                     });
-    
+
                     return { chats: newValue };
                 });
             }
@@ -442,6 +463,14 @@ const chatWindow = () => {
             icon: <MaterialIcons name="done" size={20} color="black" />,
             color: 'black',
             func: () => chooseModeOn()
+        },
+        {
+            name:'COPYTEXT',
+            private:false,
+            title:'Скопировать',
+            icon: <Feather name="copy" size={20} color="black" />,
+            color:'black',
+            func:() => copyMessageText()
         }
     ]
 
@@ -453,15 +482,69 @@ const chatWindow = () => {
     //     );
     // }
 
-    console.log(messages)
+
+    const renderItem = useCallback(({ item, index } : {item : IMessage, index: number}) => {
+        
+        const prevItem = index >= 0 ? messages ? messages[messages?.length - index - 2 ] : null : null;
+        const nextItem = index >= 0 ? messages ? messages[messages?.length - index] : null : null;
+
+        const prevDate = prevItem ?  dayjs(prevItem.DateAdd).format(`DD MMMM`) : null
+        const todayDate = dayjs(item.DateAdd).format(`DD MMMM`)
+
+        const newDate = prevDate !== todayDate ? true : false
+
+        if (item.Status === 2 || item.Status === 3) {
+            return <ChatMessage
+                newDate = {newDate}
+                samePrev={prevItem?.PeopleRoleID === item.PeopleRoleID}
+                sameNext={nextItem?.PeopleRoleID === item.PeopleRoleID}
+                openKeyboard={openKeyboard}
+                scrolledMessage={scrolledMessageID === item.ID}
+                onQuotaClick={scrollToMessage}
+                message={item}
+                handleLongPress={handleLongPress}
+                isChooseMode={isChooseMode}
+                isChoosed={choosedMessage?.findIndex((mess: any) => mess.MsgSourceID === item.ID) >= 0}
+                setChoosedMessage={setChoosedMessage}
+
+            />
+        } else if (item.Status === 4) {
+            return <DeletedMessage message={item} />
+        } else return null
+    }, [messages, scrolledMessageID, isChooseMode]);
+
     return (
-        <View style={{flex:1,backgroundColor: Colors.dark }}>
+        <View style={{ flex: 1, backgroundColor: Colors.dark }}>
             <Animated.View style={[hintStyleOverlay, { position: 'absolute', backgroundColor: 'rgba(0,0,0,0.25)', width: '100%', height: '100%', overflow: 'hidden', }]}>
                 <TouchableOpacity activeOpacity={1} onPress={overlayClick} style={{ width: '100%', height: '100%' }}>
                     <BlurView intensity={15} style={{ width: '100%', height: '100%', position: 'relative' }}>
                         <Animated.View style={[hintStyle, { backgroundColor: 'rgba(255,255,255,0.75)', position: 'absolute', borderRadius: 30, overflow: 'hidden', padding: 10 }]}>
+                            {/* <View style={[styles.container, { backgroundColor: currentPressedMessage?.isMyMessage ? '#00bedb' : Colors.secondaryDark, alignItems: currentPressedMessage?.isMyMessage ? 'flex-end' : 'flex-start', }]}>
+                            <SText size={Sizes.normal} textStyle={{ fontSize: 12, color: currentPressedMessage?.isMyMessage ? 'white' : '#6C6C6C', }}>{currentPressedMessage?.isMyMessage ? 'Вы' : currentPressedMessage?.message.MemberName}</SText>
+                                {
+                                    currentPressedMessage?.message.QuotesInfo && <View style={{ flexDirection: 'column', gap: 5, width:'100%' }}>
+                                        {
+                                            normalizeAnsweredMessage(currentPressedMessage?.message.QuotesInfo).map((str, i) => {
+                                                return <View key={`${str.ID}${str.MsgSourceID}${str.MemberName}`} style={{ flexDirection: 'row', gap: 10, backgroundColor: Colors.dark, paddingHorizontal: 20, paddingVertical: 10, paddingLeft: 10, borderRadius: 10 }}>
+                                                    <View style={{ width: 2, backgroundColor: '#CCFF00', alignItems: 'stretch' }}></View>
+                                                    <View style={{ flexDirection: 'column', alignItems: 'flex-start', gap: 5, }}>
+                                                        <SText size={Sizes.normal} textStyle={{ color: Colors.grey, fontSize: 14, }}>{str.MemberName}</SText>
+                                                        <SText size={Sizes.normal} textStyle={{ color: 'white', fontSize: 14, maxWidth: '95%' }} numberOfLines={1}>{str.Msg || 'Вложение'}</SText>
+                                                    </View>
+                                                </View>
+                                            })
+                                        }
+                                    </View>
+                                }
+                                {currentPressedMessage?.message.Msg && <SText size={Sizes.normal} textStyle={{ fontSize: 14, color: currentPressedMessage?.isMyMessage ? 'black' : '#fff' }}>{currentPressedMessage?.message.Msg}</SText>}
+
+                                {currentPressedMessage?.message.AttachmentInfo && currentPressedMessage?.message.AttachmentInfo?.split(';').map((file: string, i: number) => file.length ? <FileView key={i} isChooseMode={isChooseMode} file={file} /> : null)}
+                            </View> */}
+                                
+                            
                             {
                                 actionList.map((item) => {
+
                                     return (!item.private || currentPressedMessage?.isMyMessage) ?
                                         <TouchableOpacity onPress={item.func} style={{ paddingHorizontal: 15, paddingVertical: 10, flexDirection: 'row', alignItems: 'center', gap: 20, justifyContent: 'space-between' }} key={item.name}>
                                             <SText size={Sizes.normal} textStyle={{ fontSize: 16, color: item.color }}>{item.title}</SText>
@@ -477,21 +560,18 @@ const chatWindow = () => {
             </Animated.View>
 
             <Stack.Screen options={{
-                
+
                 headerShown: true,
                 headerTitleAlign: 'center',
                 headerTitle: (props) => (<View style={{ flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: 230 }}>
-                    <SText numberOfLines={1} textStyle={{ fontSize: 18, color: Colors.white, width: '100%', }} size={Sizes.normal}>{chat.chat.GroupName}</SText>
-                    {
-                        !isReady ? <SText numberOfLines={1} textStyle={{ fontSize: 12, color: '#505050', width: '100%', textAlign: 'center' }} size={Sizes.normal}>Connection...</SText>
-                                : <SText numberOfLines={1} textStyle={{ fontSize: 12, color: '#505050', width: '100%', textAlign: 'center' }} size={Sizes.normal}>{chat.chat.ChatName}</SText>
-                    }
+                    <SText numberOfLines={1} textStyle={{ fontSize: 18, color: Colors.white, width: '100%', }} size={Sizes.normal}>{chat[0].chat.GroupName}</SText>
+                    <SText numberOfLines={1} textStyle={{ fontSize: 12, color: '#505050', width: '100%', textAlign: 'center' }} size={Sizes.normal}>{isReady ? loading ? 'Обновление...' : chat[0].chat.ChatName : 'Connecting...'}</SText>
                 </View>),
                 headerStyle: { backgroundColor: '#161616' },
                 headerTitleStyle: { color: Colors.white },
                 headerShadowVisible: false,
                 headerBackTitleVisible: false,
-                headerBackVisible:false,
+                headerBackVisible: false,
                 headerBlurEffect: 'dark',
                 headerRight: (props) => (
                     <TouchableOpacity onPress={() => {
@@ -519,7 +599,7 @@ const chatWindow = () => {
                                 <Loader />
                             </View>
                             : Boolean(messages?.length)
-                                ? <View style={{backgroundColor: Colors.secondaryDark, flex:1}}>
+                                ? <View style={{ backgroundColor: Colors.secondaryDark, flex: 1 }}>
                                     {
                                         history?.fixed && <TouchableOpacity onPress={() => scrollToMessage(history?.fixed.ID)} style={{ borderTopColor: 'black', borderTopWidth: 1, padding: 15, paddingVertical: 5, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 10 }}>
                                             <AntDesign style={{ flexGrow: 0, flexShrink: 0 }} name="pushpino" size={20} color={Colors.white} />
@@ -539,27 +619,13 @@ const chatWindow = () => {
                                         onEndReachedThreshold={0.9}
                                         onScrollToIndexFailed={() => { }}
                                         inverted
-                                        contentContainerStyle={{ padding: 15, gap: 15, flexDirection: 'column', }}
+                                        contentContainerStyle={{ padding: 15, flexDirection: 'column', }}
                                         style={{ backgroundColor: Colors.dark }}
-                                        data={messages ? [...messages].reverse() : []}
-                                        keyExtractor={item => `${item.ID} ${item.ChatID} ${item.MemberName} ${item.SessionID}`}
-                                        renderItem={({ item }) => {
-                                            if (item.Status === 2 || item.Status === 3) {
-                                                return <ChatMessage
-                                                    openKeyboard={openKeyboard}
-                                                    scrolledMessage={scrolledMessageID === item.ID}
-                                                    onQuotaClick={scrollToMessage}
-                                                    message={item}
-                                                    handleLongPress={handleLongPress}
-                                                    isChooseMode={isChooseMode}
-                                                    isChoosed={choosedMessage?.findIndex((mess: any) => mess.MsgSourceID === item.ID) >= 0}
-                                                    setChoosedMessage={setChoosedMessage}
-
-                                                />
-                                            } else if (item.Status === 4) {
-                                                return <DeletedMessage message={item} />
-                                            } else return null
-                                        }}
+                                        data={reversedMessages}
+                                        initialNumToRender={20}
+                                        maxToRenderPerBatch={20}
+                                        keyExtractor={item => item.ID.toString()}
+                                        renderItem={renderItem}
                                         ListFooterComponent={() => {
                                             return messages && Number(messages[0]?.RowNum) - 1 > 1 ? <SText textStyle={{ textAlign: 'center', color: 'white' }}>Загрузка...</SText> : null
 
@@ -578,7 +644,7 @@ const chatWindow = () => {
 
                         <Animated.View style={[buttonsFiledStyle, { flexDirection: 'row', paddingTop: 7, paddingBottom: 5, paddingHorizontal: 15, alignItems: 'center', gap: 10, justifyContent: 'center', position: 'absolute' }]}>
                             <TouchableOpacity style={[styles.helperBtn]} onPress={() => {
-                                
+
                                 setChooseMode(false)
                                 clearAnsweredMessages()
                             }}><SText textStyle={[styles.helperBtnText, { color: 'red' }]} size={Sizes.normal}>Отменить</SText></TouchableOpacity>
@@ -600,7 +666,7 @@ const chatWindow = () => {
                                 </TouchableOpacity> */}
                                 <ChatInput
                                     reff={chatInputRef}
-                                    disabled={Number(new Date(chat.chat.DateEnd)) < Number(new Date()) || !isReady}
+                                    disabled={Number(new Date(chat[0].chat.DateEnd)) < Number(new Date()) || !isReady}
                                     handler={isEditMode ? sendEditMessage : sendMessage}
                                 />
                             </View>
@@ -615,26 +681,28 @@ const chatWindow = () => {
                 <BottomSheet
                     index={-1}
                     onChange={(idx) => {
-                        if(idx === -1){
+                        if (idx === -1) {
                             Keyboard.dismiss()
                         }
                         handleSheetChange(idx)
-                        
+
                     }}
-                    backgroundStyle={{backgroundColor:'#161616'}}
-                    snapPoints={['50%','95%']}
+                    backgroundStyle={{ backgroundColor: '#161616' }}
+                    snapPoints={['50%', '95%']}
                     enablePanDownToClose
                     ref={onlineUserBottomSheetRef}
-                    style={{ borderRadius: 40, overflow: "hidden", backgroundColor: '#161616'}}
-                    containerStyle={{ borderRadius: 40}}
+                    style={{ borderRadius: 40, overflow: "hidden", backgroundColor: '#161616' }}
+                    containerStyle={{ borderRadius: 40 }}
                     backdropComponent={(props: any) => (
-                        <Backdrop  {...props} opacity={0.8} disappearsOnIndex={-1} appearsOnIndex={0} />)}
+                        <Backdrop children={ <BlurView intensity={10} style={{flex:1, width:'100%', height:'100%'}}/>}  {...props} opacity={0.8} disappearsOnIndex={-1} appearsOnIndex={0} >
+                           
+                        </Backdrop>)}
                     handleIndicatorStyle={{}}>
                     <BottomSheetView>
-                        <OnlineUsers isHalfExpanded={isHalfExpanded} ref={onlineUserBottomSheetRef}/>
+                        <OnlineUsers isHalfExpanded={isHalfExpanded} ref={onlineUserBottomSheetRef} />
                     </BottomSheetView>
                 </BottomSheet>
-
+            
 
             </GestureHandlerRootView>
 
@@ -661,6 +729,14 @@ const styles = StyleSheet.create({
         justifyContent: 'flex-start',
         gap: 15,
         paddingHorizontal: 15,
-        marginTop: 7, 
+        marginTop: 7,
+    },
+    container: {
+        padding: 20,
+        borderRadius: 25,
+        backgroundColor: Colors.secondaryDark,
+        gap: 10,
+        width: 'auto',
+        marginBottom: 7
     }
 })

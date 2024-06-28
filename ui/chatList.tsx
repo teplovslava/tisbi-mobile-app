@@ -16,12 +16,13 @@ interface IProps {
 const ChatList = ({info, text, count }: IProps) => {
     const socket = useContext(WebsocketContext)
     let currentChat = socket?.currentChat 
+
     
     return (
         <TouchableOpacity
             onPress={() => {
                 currentChat.current = String(info.chat.ID);
-                router.push({ pathname: "/(tabs)/(chat)/chatWindow", params: { info: JSON.stringify(info) } });
+                router.push({ pathname: "/(tabs)/(chat)/chatWindow", params: { id: JSON.stringify(info.chat.ID) } });
             }}
             style={styles.container} >
             <View style={styles.header}>

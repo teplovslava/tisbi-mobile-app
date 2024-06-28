@@ -1,4 +1,4 @@
-import { IChatList, IGroupsList, IHistory, IMember, IUserList, IWebSocketContext } from "@/interface";
+import { IChatList, IGroupsList, IHistory, IMember, IMessage, IUserList, IWebSocketContext } from "@/interface";
 import { createContext, useCallback, useEffect, useRef, useState } from "react";
 import * as Haptics from 'expo-haptics';
 import { AppState, AppStateStatus } from "react-native";
@@ -66,10 +66,11 @@ export const WebsocketProvider = ({ children, token }: IProps) => {
 
                 case 'chat-history':
                     setHistory((prev: any) => {
+                        if(!currentChat.current) return
                         if (currentChat.current != value.messages[0]?.ChatID) {
                             return { ...value, messages: [...value.messages, ...value.newMessages] }
                         } else {
-                            let newValue = value?.messages ? value.messages : []
+                            let newValue = value?.messages ? value.messages.filter((item:IMessage) => item.Status !== 1) : []
                             let newPrev = prev?.messages ? prev.messages : []
                             if (prev) {
                                 return {
@@ -79,7 +80,8 @@ export const WebsocketProvider = ({ children, token }: IProps) => {
                             } else {
                                 // console.log(value)
                                 // // const newValue = {...value, messages: [...value.messages,...value.newMessages]}
-                                return { ...value, messages: [...value.messages, ...value.newMessages] }
+                                const newVal = value.messages.filter((item:IMessage) => item.Status !== 1)
+                                return { ...value, messages: [...newVal,...value.newMessages.filter((item:IMessage) => item.Status !== 1)] }
                             }
                         }
 
@@ -117,7 +119,7 @@ export const WebsocketProvider = ({ children, token }: IProps) => {
                                     messages: [...newPrev, value]
                                 }
                             } else {
-                                return [value]
+                                return [{...value, messages: [value.messages.filter((item:IMessage) => item.Status !== 1)]}]
                             }
                         })
                     } else {
@@ -225,19 +227,19 @@ export const WebsocketProvider = ({ children, token }: IProps) => {
                         const messages = prev?.messages || []
                         const fixed = prev?.fixed
                         const idx = messages?.findIndex((mess: any) => String(mess.ID) === String(value.ID))
-                        const isFixed = String(fixed.ID) === String(value.ID)
+                        const isFixed = String(fixed?.ID) === String(value.ID)
                         if (idx !== undefined && idx >= 0) {
                             messages[idx] = {
                                 ...messages[idx],
+                                DateEdit: Date.now(),
                                 Msg: value.Msg,
 
                             }
                         }
 
-
                         return {
                             ...prev,
-                            fixed: isFixed ? { ...prev.fixed, Msg: value.Msg } : { ...prev.fixed },
+                            fixed: isFixed ? { ...prev.fixed, Msg: value.Msg } :  prev.fixed ,
                             messages
                         }
                     })
