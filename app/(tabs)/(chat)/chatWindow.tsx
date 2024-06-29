@@ -39,7 +39,7 @@ const chatWindow = () => {
     const [loading, setLoading] = useState(true)
     const actionListPosition = useSharedValue({ state: false, x: 0, y: 0 })
     const [isChooseMode, setChooseMode] = useState(false)
-    const [choosedMessage, setChoosedMessage] = useState([])
+    const [choosedMessage, setChoosedMessage] = useState<any>([])
     const [isHalfExpanded, setIsHalfExpanded] = useState(true);
     const [currentPressedMessage, setCurrentPressedMessage] = useState<IAnsweredMessage & { isMyMessage: boolean, message: any } | null>(null)
     const [scrolledMessageID, setScrolledMessageID] = useState<number | null>(0)
@@ -52,6 +52,7 @@ const chatWindow = () => {
     const history = socket?.history
     const isReady = socket?.isReady
     const messages = history?.messages
+    const messagesRef = useRef(messages)
     const setHistory = socket?.setHistory
     const currentMessage = socket?.currentMessage
     const answeredMessage = socket?.answeredMessage
@@ -73,7 +74,8 @@ const chatWindow = () => {
 
 
     const scrollToMessage = useCallback((id: string) => {
-        const idx = messages?.findIndex((message) => String(message.ID) === String(id));
+        setScrolledMessageID(null)
+        const idx = messagesRef?.current?.findIndex((message) => String(message.ID) === String(id));
 
         if (timerRef.current) {
             clearTimeout(timerRef.current);
@@ -81,17 +83,17 @@ const chatWindow = () => {
         }
 
         if (idx !== undefined && idx >= 0) {
-            flatListRef.current?.scrollToIndex({ animated: true, index: messages ? messages.length - idx - 1 : 0 });
-            setScrolledMessageID(messages ? messages[idx].ID : null);
+            flatListRef.current?.scrollToIndex({ animated: true, index: messagesRef?.current ? messagesRef?.current?.length - idx - 1 : 0 });
+            setScrolledMessageID(messagesRef.current ? messagesRef?.current?.[idx].ID : null);
         } else {
-            flatListRef.current?.scrollToIndex({ animated: true, index: messages ? messages.length - 1 : 0 });
+            flatListRef.current?.scrollToIndex({ animated: true, index: messagesRef?.current ? messagesRef?.current?.length - 1 : 0 });
             timerRef.current = setTimeout(() => {
                 if (recursiveCallbackRef.current) {
                     recursiveCallbackRef.current(id);
                 }
             }, 500);
         }
-    }, [messages]);
+    }, [messagesRef]);
 
     const recursiveCallbackRef = useRef(scrollToMessage);
 
@@ -334,6 +336,33 @@ const chatWindow = () => {
         openKeyboard()
     }
 
+    const setMessageAndBelt = useCallback((message:IMessage) => {
+        openKeyboard()
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy)
+        setChoosedMessage([{
+            ID: null,
+            InProggress: true,
+            IsRemove: false,
+            MemberName: message.MemberName,
+            Msg: message.Msg,
+            MsgSourceID: message.ID
+        }])
+
+        const isInChoosed = answeredMessage.current.findIndex((mess: any) => mess.MsgSourceID === message.ID)
+        if (isInChoosed >= 0) {
+            answeredMessage.current?.filter((mess: any) => mess.MsgSourceID !== message.ID)
+        } else {
+            answeredMessage.current.push({
+                ID: null,
+                InProggress: true,
+                IsRemove: false,
+                MemberName: message.MemberName,
+                Msg: message.Msg,
+                MsgSourceID: message.ID
+            })
+        }
+    },[])
+
     // add messages to answer when choose mode is true
     const addMessagesToAnswer = () => {
         setChooseMode(false)
@@ -399,6 +428,7 @@ const chatWindow = () => {
 
 
     useEffect(() => {
+        messagesRef.current = messages
         if (messages) {
             setLoading(false);
             if (setChatList) {
@@ -474,14 +504,6 @@ const chatWindow = () => {
         }
     ]
 
-    //     if (!ws?.readyState) {
-    //     return (
-    //         <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.dark }}>
-    //             <Text style={{ color: Colors.white }}>Подключение...</Text>
-    //         </View>
-    //     );
-    // }
-
 
     const renderItem = useCallback(({ item, index } : {item : IMessage, index: number}) => {
         
@@ -493,12 +515,14 @@ const chatWindow = () => {
 
         const newDate = prevDate !== todayDate ? true : false
 
+        const isMyMessage = history?.user?.roleId === item?.PeopleRoleID
+
         if (item.Status === 2 || item.Status === 3) {
             return <ChatMessage
                 newDate = {newDate}
                 samePrev={prevItem?.PeopleRoleID === item.PeopleRoleID}
                 sameNext={nextItem?.PeopleRoleID === item.PeopleRoleID}
-                openKeyboard={openKeyboard}
+                setMessageAndBelt={setMessageAndBelt}
                 scrolledMessage={scrolledMessageID === item.ID}
                 onQuotaClick={scrollToMessage}
                 message={item}
@@ -506,12 +530,13 @@ const chatWindow = () => {
                 isChooseMode={isChooseMode}
                 isChoosed={choosedMessage?.findIndex((mess: any) => mess.MsgSourceID === item.ID) >= 0}
                 setChoosedMessage={setChoosedMessage}
+                isMyMessage={isMyMessage}
 
             />
         } else if (item.Status === 4) {
             return <DeletedMessage message={item} />
         } else return null
-    }, [messages, scrolledMessageID, isChooseMode]);
+    }, [messages, scrolledMessageID, isChooseMode,choosedMessage]);
 
     return (
         <View style={{ flex: 1, backgroundColor: Colors.dark }}>

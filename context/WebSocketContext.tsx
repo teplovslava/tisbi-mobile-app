@@ -66,11 +66,11 @@ export const WebsocketProvider = ({ children, token }: IProps) => {
 
                 case 'chat-history':
                     setHistory((prev: any) => {
-                        if(!currentChat.current) return
+                        if (!currentChat.current) return
                         if (currentChat.current != value.messages[0]?.ChatID) {
                             return { ...value, messages: [...value.messages, ...value.newMessages] }
                         } else {
-                            let newValue = value?.messages ? value.messages.filter((item:IMessage) => item.Status !== 1) : []
+                            let newValue = value?.messages ? value.messages.filter((item: IMessage) => item.Status !== 1) : []
                             let newPrev = prev?.messages ? prev.messages : []
                             if (prev) {
                                 return {
@@ -80,8 +80,8 @@ export const WebsocketProvider = ({ children, token }: IProps) => {
                             } else {
                                 // console.log(value)
                                 // // const newValue = {...value, messages: [...value.messages,...value.newMessages]}
-                                const newVal = value.messages.filter((item:IMessage) => item.Status !== 1)
-                                return { ...value, messages: [...newVal,...value.newMessages.filter((item:IMessage) => item.Status !== 1)] }
+                                const newVal = value.messages.filter((item: IMessage) => item.Status !== 1)
+                                return { ...value, messages: [...newVal, ...value.newMessages.filter((item: IMessage) => item.Status !== 1)] }
                             }
                         }
 
@@ -119,7 +119,7 @@ export const WebsocketProvider = ({ children, token }: IProps) => {
                                     messages: [...newPrev, value]
                                 }
                             } else {
-                                return [{...value, messages: [value.messages.filter((item:IMessage) => item.Status !== 1)]}]
+                                return [{ ...value, messages: [value.messages.filter((item: IMessage) => item.Status !== 1)] }]
                             }
                         })
                     } else {
@@ -198,12 +198,17 @@ export const WebsocketProvider = ({ children, token }: IProps) => {
                 case 'msg-delete':
                     if (currentChat.current == value.ChatID) {
                         setHistory((prev: any) => {
-                            const newHistory = { ...prev }
-                            const idx = newHistory.messages.findIndex((mess: any) => mess.ID === value.ID)
-                            if (idx && idx >= 0) {
-                                newHistory.messages[idx].Status = 4
-                            }
-                            return newHistory
+                            const newMessages = prev.messages.map((mess: any) => {
+                                if (mess.ID === value.ID) {
+                                    return {
+                                        ...mess,
+                                        Status: 4
+                                    };
+                                }
+                                return mess;
+                            });
+
+                            return { ...prev, messages: newMessages }
                         })
                     }
                     break
@@ -226,21 +231,26 @@ export const WebsocketProvider = ({ children, token }: IProps) => {
                     setHistory((prev: any) => {
                         const messages = prev?.messages || []
                         const fixed = prev?.fixed
-                        const idx = messages?.findIndex((mess: any) => String(mess.ID) === String(value.ID))
-                        const isFixed = String(fixed?.ID) === String(value.ID)
-                        if (idx !== undefined && idx >= 0) {
-                            messages[idx] = {
-                                ...messages[idx],
-                                DateEdit: Date.now(),
-                                Msg: value.Msg,
 
+                        const isFixed = String(fixed?.ID) === String(value.ID)
+
+
+                        const newMessages = prev.messages.map((mess: any) => {
+                            if (mess.ID === value.ID) {
+                                return {
+                                    ...mess,
+                                    DateEdit: Date.now(),
+                                    Msg: value.Msg,
+                                };
                             }
-                        }
+                            return mess;
+                        });
+
 
                         return {
                             ...prev,
-                            fixed: isFixed ? { ...prev.fixed, Msg: value.Msg } :  prev.fixed ,
-                            messages
+                            fixed: isFixed ? { ...prev.fixed, Msg: value.Msg } : prev.fixed,
+                            messages: newMessages
                         }
                     })
 
@@ -259,7 +269,7 @@ export const WebsocketProvider = ({ children, token }: IProps) => {
 
                     })
                     break
-                
+
 
                 default:
                     console.log(value)
@@ -275,21 +285,21 @@ export const WebsocketProvider = ({ children, token }: IProps) => {
 
         const handleAppStateChange = (nextAppState: AppStateStatus) => {
             if (nextAppState === 'background') {
-              // Приложение перешло в фоновый режим
-              ws.current?.close()
-              setIsReady(false)
+                // Приложение перешло в фоновый режим
+                ws.current?.close()
+                setIsReady(false)
             }
-          };
-      
-          const subscription = AppState.addEventListener('change', handleAppStateChange);
-      
-          return () => {
+        };
+
+        const subscription = AppState.addEventListener('change', handleAppStateChange);
+
+        return () => {
             subscription.remove();
-          };
+        };
 
     }, [webSocketConnect, ws,])
 
-    
+
 
     const socketValue = {
         ws: ws.current,

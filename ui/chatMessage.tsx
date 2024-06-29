@@ -24,17 +24,15 @@ interface IProps {
     isChoosed: boolean,
     onQuotaClick: any,
     scrolledMessage: any,
-    openKeyboard: any
+    setMessageAndBelt: any,
+    isMyMessage:boolean
 }
 
 const screenWidth = Dimensions.get('window').width
 const screenHeight = Dimensions.get('window').height
 
-const ChatMessage = ({ newDate, samePrev, sameNext, message, openKeyboard, handleLongPress, isChooseMode, setChoosedMessage, isChoosed, onQuotaClick, scrolledMessage }: IProps) => {
+const ChatMessage = ({ newDate, samePrev, sameNext, message,isMyMessage, setMessageAndBelt, handleLongPress, isChooseMode, setChoosedMessage, isChoosed, onQuotaClick, scrolledMessage }: IProps) => {
 
-    const socket = useContext(WebsocketContext)
-    const history = socket?.history
-    const answeredMessage = socket?.answeredMessage
 
     const isChanged = message.DateEdit &&  message.DateAdd !== message.DateEdit
 
@@ -45,39 +43,8 @@ const ChatMessage = ({ newDate, samePrev, sameNext, message, openKeyboard, handl
     const translateX = useSharedValue(0);
     const isBelt = useSharedValue(false);
     const isChoosedMessage = useSharedValue(false)
-    const isMyMessage = history?.user?.roleId === message?.PeopleRoleID
-
-    console.log('render')
 
 
-
-
-    const setMessageAndBelt = () => {
-        openKeyboard()
-        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy)
-        setChoosedMessage([{
-            ID: null,
-            InProggress: true,
-            IsRemove: false,
-            MemberName: message.MemberName,
-            Msg: message.Msg,
-            MsgSourceID: message.ID
-        }])
-
-        const isInChoosed = answeredMessage.current.findIndex((mess: any) => mess.MsgSourceID === message.ID)
-        if (isInChoosed >= 0) {
-            answeredMessage.current?.filter((mess: any) => mess.MsgSourceID !== message.ID)
-        } else {
-            answeredMessage.current.push({
-                ID: null,
-                InProggress: true,
-                IsRemove: false,
-                MemberName: message.MemberName,
-                Msg: message.Msg,
-                MsgSourceID: message.ID
-            })
-        }
-    }
 
     const drag = Gesture.Pan()
         .manualActivation(true)
@@ -110,7 +77,7 @@ const ChatMessage = ({ newDate, samePrev, sameNext, message, openKeyboard, handl
                 translateX.value = event.translationX * 0.5 - 20
                 if (!isBelt.value) {
                     isBelt.value = true
-                    runOnJS(setMessageAndBelt)()
+                    runOnJS(setMessageAndBelt)(message)
                 }
             } else {
                 return
@@ -154,7 +121,6 @@ const ChatMessage = ({ newDate, samePrev, sameNext, message, openKeyboard, handl
             ],
         }
     })
-
 
     const choosedMessageStyle = useAnimatedStyle(() => {
         return {
