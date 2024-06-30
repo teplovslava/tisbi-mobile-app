@@ -1,4 +1,4 @@
-import { Dimensions, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { Dimensions, Linking, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import React, { Dispatch, SetStateAction, memo, useContext, useState } from 'react'
 import { Gesture, GestureDetector } from 'react-native-gesture-handler'
 import SText, { Sizes } from '@/components/StyledText'
@@ -32,8 +32,11 @@ interface IProps {
 const screenWidth = Dimensions.get('window').width
 const screenHeight = Dimensions.get('window').height
 
+const urlRegex = /(https?:\/\/[^\s]+)/g;
+
 const ChatMessage = ({ newDate, samePrev, sameNext, message,isMyMessage, setMessageAndBelt, handleLongPress, isChooseMode, setChoosedMessage, isChoosed, onQuotaClick, scrolledMessage }: IProps) => {
 
+    const parts = message.Msg.split(urlRegex);
 
     const isChanged = message.DateEdit &&  message.DateAdd !== message.DateEdit
 
@@ -246,7 +249,26 @@ const ChatMessage = ({ newDate, samePrev, sameNext, message,isMyMessage, setMess
                                         }
                                     </View>
                                 }
-                                {message.Msg && <SText size={Sizes.normal} textStyle={{ fontSize: 14, color: Colors.light }}>{message.Msg}</SText>}
+                                {message.Msg &&
+                                <SText>
+                                    {
+                                        parts.map((part, index) => {
+                                            if (urlRegex.test(part)) {
+                                              return (
+                                                <TouchableOpacity style={{marginBottom:-2}} key={index} onPress={() => Linking.openURL(part)}>
+                                                  <SText size={Sizes.normal} textStyle={[{ fontSize: 14 },styles.link]}>{part}</SText>
+                                                </TouchableOpacity>
+                                              );
+                                            } else {
+                                              return <SText size={Sizes.normal} textStyle={{ fontSize: 14, color: Colors.light }}>{part}</SText>
+                                            }
+                                          })
+                                    }
+                                </SText>
+                                
+                                
+                                
+                                }
 
                                 {message.AttachmentInfo && <View style={{gap:3, width:'100%'}}>
                                     {files.map((file: string, i: number) => file.length ? <FileView key={i} isChooseMode={isChooseMode} file={file} /> : null)}
@@ -291,5 +313,10 @@ const styles = StyleSheet.create({
         borderBottomLeftRadius: 25,
         backgroundColor: Colors.secondaryDark,
         gap: 10,
+    },
+    link:{
+        color:Colors.blue,
+        textDecorationColor:Colors.blue,
+        textDecorationLine:'underline',
     }
 })

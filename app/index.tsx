@@ -170,8 +170,8 @@ export default function Auth() {
             <Button
               disabled={login.length < 2 || pass.length < 7}
               handler={() => handleLogin(login, pass)}
-              buttonStyleProps={{ backgroundColor: Colors.light, marginTop: 30, opacity: (login.length < 2 || pass.length < 7) ? 0.1 : 1 }}
-              textStyleProps={{ textAlign: "center", color: Colors.dark }}
+              buttonStyleProps={{ backgroundColor: Colors.light, marginTop: 30, opacity: (login.length < 2 || pass.length < 7) ? 0.4 : 1 }}
+              textStyleProps={{ textAlign: "center", color: Colors.black }}
             >
               Enter
             </Button>

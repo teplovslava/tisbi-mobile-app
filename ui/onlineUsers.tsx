@@ -105,7 +105,7 @@ const OnlineUsers = (props: any, ref: any) => {
             <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
                 <View style={{gap:7,padding: 10, marginBottom: 10, backgroundColor: Colors.black, borderRadius: 12, flexDirection:'row', alignItems:'center'}}>
                 <Feather name="search" size={14} color={Colors.darkGrey} />
-                <TextInput placeholder='Поиск...' style={{  fontFamily: 'GilroyRegular', flex:1, color:Colors.light}} onFocus={() => ref?.current?.snapToIndex(1)} onChangeText={setValue}
+                <TextInput placeholderTextColor={Colors.darkGrey} placeholder='Поиск...' style={{  fontFamily: 'GilroyRegular', flex:1, color:Colors.light}} onFocus={() => ref?.current?.snapToIndex(1)} onChangeText={setValue}
                     value={value} onCancelled={() => ref?.current?.forceClose()} />
                 </View>
             </TouchableWithoutFeedback>
