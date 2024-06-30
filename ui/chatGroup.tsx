@@ -15,7 +15,7 @@ const ChatGroup = ({ text, count }: IProps) => {
     return (
         <TouchableOpacity onPress={() => router.push({ pathname: "/(tabs)/(chat)/chatsList", params: { name: text } })} style={styles.container}>
             <View style={{ flexGrow: 0, flexShrink: 0, width: '80%' }}>
-                <SText textStyle={{ fontSize: 18, color: Colors.white }} size={Sizes.bold}>{text || 'Без названия'}</SText>
+                <SText textStyle={{ fontSize: 18, color: Colors.light }} size={Sizes.bold}>{text || 'Без названия'}</SText>
             </View>
             {!!count && <View style={styles.notific}>
                 <SText textStyle={{ fontSize: 12, color: Colors.dark }} size={Sizes.normal}>{count}</SText>
@@ -28,7 +28,7 @@ export default ChatGroup
 
 const styles = StyleSheet.create({
     container: {
-        backgroundColor: Colors.secondaryDark,
+        backgroundColor: Colors.lightBlack,
         padding: 20,
         borderRadius: 20,
         flexDirection: 'row',
@@ -37,7 +37,7 @@ const styles = StyleSheet.create({
         minHeight: 100,
     },
     notific: {
-        backgroundColor: '#CCFF00',
+        backgroundColor: Colors.green,
         padding: 5,
         borderRadius: 20,
         flexDirection: 'row',

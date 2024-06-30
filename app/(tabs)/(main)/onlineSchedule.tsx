@@ -45,29 +45,29 @@ const OnlineSchedule = () => {
                 headerBackButtonMenuEnabled:false,
                 headerBackVisible:false,
                 headerTitleAlign:'center',
-                headerTitle: (props) => (<SText textStyle={{ fontSize: 18, color: Colors.white }} size={Sizes.normal}>Online lessons</SText>),
-                headerStyle: { backgroundColor: '#161616' },
+                headerTitle: (props) => (<SText textStyle={{ fontSize: 18, color: Colors.light }} size={Sizes.normal}>Online lessons</SText>),
+                headerStyle: { backgroundColor: Colors.lightBlack },
                 headerBackTitleVisible: false,
-                headerTitleStyle: { color: Colors.white },
+                headerTitleStyle: { color: Colors.light },
                 headerShadowVisible: false,
                 headerBlurEffect: 'dark',
                 headerLeft: (props) => (
                     <TouchableOpacity onPress={() => router.back()} {...props}>
-                        <Ionicons name="chevron-back-outline" size={28} color="#6b99c3" />
+                        <Ionicons name="chevron-back-outline" size={28} color={Colors.main} />
                     </TouchableOpacity>
                 ),
                 headerRight: (props) => (
                     <TouchableOpacity onPress={getOnlineLessons} {...props}>
-                        <AntDesign name="reload1" size={22} color={Colors.white} />
+                        <AntDesign name="reload1" size={22} color={Colors.light} />
                     </TouchableOpacity>
                 )
             }}
             />
-            <View style={{ flex: 1, backgroundColor: Colors.dark, paddingHorizontal: 20 }}>
+            <View style={{ flex: 1, backgroundColor: Colors.black, paddingHorizontal: 20 }}>
                 {loading ? (<View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}><Loader /></View>)
                     : !Object.keys(lessons).length
                     ? <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-                            <SText size={Sizes.normal} textStyle={{ color: Colors.white, fontSize:18}}>No lessons</SText>
+                            <SText size={Sizes.normal} textStyle={{ color: Colors.light, fontSize:18}}>No lessons</SText>
                             <Empty/>
                           </View>
                     : <ScrollView
@@ -78,8 +78,8 @@ const OnlineSchedule = () => {
                             Object.keys(lessons).map((item: any, i: number) => (
                                 <Animated.View key={i} entering={FadeInUp.delay(i*150)}>
                                     <View style={{flexDirection:'row', alignItems:'center', justifyContent:'center', gap:7}}>
-                                        <SText  size={Sizes.bold} textStyle={{ color: Colors.white, marginBottom: 10, fontSize: 20, textAlign: 'center' }}>{dayjs(item).format('DD')}</SText>
-                                        <SText  size={Sizes.bold} textStyle={{ color: Colors.white, marginBottom: 10, fontSize: 20, textAlign: 'center' }}>{dayjs(item).format('MMMM')}</SText>
+                                        <SText  size={Sizes.bold} textStyle={{ color: Colors.light, marginBottom: 10, fontSize: 20, textAlign: 'center' }}>{dayjs(item).format('DD')}</SText>
+                                        <SText  size={Sizes.normal} textStyle={{ color: Colors.lightGrey, marginBottom: 10, fontSize: 20, textAlign: 'center' }}>{dayjs(item).format('MMMM')}</SText>
                                     </View>
                                     <View style={{ gap: 10, marginBottom: 20 }}>
                                         {lessons[item].map((lesson: IOnlineLesson, index: number) => <OnlineScheduleItem key={index} lesson={lesson}/>)}

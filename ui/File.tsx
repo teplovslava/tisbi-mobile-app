@@ -1,4 +1,5 @@
 import SText, { Sizes } from "@/components/StyledText"
+import Colors from "@/constants/Colors"
 import { WebsocketContext } from "@/context/WebSocketContext"
 import { getFile } from "@/service"
 import { generateExcel } from "@/service/saveFile"
@@ -44,9 +45,9 @@ export const FileView = ({ isChooseMode, file }: {isChooseMode:boolean, file: st
     }
 
     return (
-        <TouchableOpacity disabled={isChooseMode} onPress={downloadFile} activeOpacity={0.5} style={{ flexDirection: 'row', gap: 10, padding:10, borderRadius:10, backgroundColor:'#262930', width:'100%',}}>
+        <TouchableOpacity disabled={isChooseMode} onPress={downloadFile} activeOpacity={0.5} style={{ flexDirection: 'row', gap: 10, padding:10, borderRadius:10, backgroundColor:'rgba(0,0,0,0.45)', width:'100%',}}>
             <View style={{ position: 'relative' }}>
-                <FontAwesome name="file" size={40} color="#7B68EE" />
+                <FontAwesome name="file" size={40} color={Colors.violet} />
                 <SText size={Sizes.bold} textStyle={{ color: 'white', position: 'absolute', left: 0, top: 20, width: '100%', textAlign: 'center', fontSize: 10 }}>{format}</SText>
             </View>
             <SText numberOfLines={3} size={Sizes.normal} textStyle={{ fontSize: 14, color: '#fff', flexGrow:1, flexShrink:1}}>{name}</SText>

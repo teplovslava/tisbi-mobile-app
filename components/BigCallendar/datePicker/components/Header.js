@@ -4,6 +4,7 @@ import {View, TouchableOpacity, Text, Image, StyleSheet, Animated, I18nManager} 
 import { AntDesign } from '@expo/vector-icons';
 
 import {useCalendar} from '../DatePicker';
+import Colors from '@/constants/Colors';
 
 const Header = ({changeMonth}) => {
   const {
@@ -52,7 +53,7 @@ const Header = ({changeMonth}) => {
         activeOpacity={0.7}
         onPress={() => !nextDisable && onChangeMonth('NEXT')}
         style={style.arrowWrapper}>
-        <AntDesign name="right" size={16} color="#6b99c3" />
+        <AntDesign name="right" size={16} color={Colors.main} />
       </TouchableOpacity>
       <View style={style.monthYearContainer}>
         <Animated.View
@@ -116,7 +117,7 @@ const Header = ({changeMonth}) => {
         activeOpacity={0.7}
         onPress={() => !prevDisable && onChangeMonth('PREVIOUS')}
         style={style.arrowWrapper}>
-        <AntDesign name="left" size={16} color="#6b99c3" />
+        <AntDesign name="left" size={16} color={Colors.main} />
       </TouchableOpacity>
     </View>
   );
@@ -180,6 +181,7 @@ const styles = (theme) =>
       color: 'black',
       fontFamily: 'GilroyBold',
       textAlignVertical: 'center',
+      color:Colors.light
     },
     monthText: {
       fontSize: theme.textHeaderFontSize,

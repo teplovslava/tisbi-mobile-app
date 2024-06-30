@@ -4,7 +4,7 @@ import OnlineUser from './onlineUser'
 import { IMember } from '@/interface'
 import { WebsocketContext } from '@/context/WebSocketContext'
 import { FlatList, TextInput } from 'react-native-gesture-handler'
-import { AntDesign } from '@expo/vector-icons'
+import { AntDesign, Feather } from '@expo/vector-icons'
 import SText, { Sizes } from '@/components/StyledText'
 import Colors from '@/constants/Colors'
 import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated'
@@ -82,14 +82,14 @@ const OnlineUsers = (props: any, ref: any) => {
 
         <View style={{ paddingHorizontal: 20, paddingTop: 10, height: '100%' }}>
             <TouchableOpacity
-                style={{ padding: 5, backgroundColor: '#303030', marginLeft: 'auto', marginBottom: 10, borderRadius: 20, marginTop: -10 }}
+                style={{ padding: 5, backgroundColor: Colors.darkGrey, marginLeft: 'auto', marginBottom: 10, borderRadius: 20, marginTop: -10 }}
                 onPress={() => {
                     Keyboard.dismiss()
                     ref?.current?.forceClose()
                 }}>
                 <AntDesign name="close" size={20} color="white" />
             </TouchableOpacity>
-            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-evenly', backgroundColor: '#303030', borderRadius: 12, marginBottom: 10 }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-evenly', backgroundColor: Colors.black, borderRadius: 12, marginBottom: 10 }}>
                 <Animated.View style={[{ width: '30%', backgroundColor: '#202020', height: 30, position: 'absolute', borderRadius: 7 }, animatedStyle]} />
                 {elements.map((element, index) => (
                     <TouchableOpacity
@@ -98,13 +98,16 @@ const OnlineUsers = (props: any, ref: any) => {
                         onPress={() => handlePress(index)}
                         style={{ padding: 12, width: '33.3%' }}
                     >
-                        <SText size={Sizes.normal} textStyle={{ color: Colors.white, textAlign: 'center' }}>{element} ({String(counts[index])})</SText>
+                        <SText size={Sizes.normal} textStyle={{ color: Colors.light, textAlign: 'center' }}>{element} ({String(counts[index])})</SText>
                     </TouchableOpacity>
                 ))}
             </View>
             <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
-                <TextInput placeholder='Поиск...' style={{ padding: 10, marginBottom: 10, fontFamily: 'GilroyRegular', backgroundColor: '#303030', borderRadius: 12 }} onFocus={() => ref?.current?.snapToIndex(1)} onChangeText={setValue}
+                <View style={{gap:7,padding: 10, marginBottom: 10, backgroundColor: Colors.black, borderRadius: 12, flexDirection:'row', alignItems:'center'}}>
+                <Feather name="search" size={14} color={Colors.darkGrey} />
+                <TextInput placeholder='Поиск...' style={{  fontFamily: 'GilroyRegular', flex:1, color:Colors.light}} onFocus={() => ref?.current?.snapToIndex(1)} onChangeText={setValue}
                     value={value} onCancelled={() => ref?.current?.forceClose()} />
+                </View>
             </TouchableWithoutFeedback>
             <FlatList
                 bounces

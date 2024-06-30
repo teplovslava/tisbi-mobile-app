@@ -35,10 +35,10 @@ const Settings = () => {
                 headerBackButtonMenuEnabled: true,
                 headerBackVisible: false,
                 headerTitleAlign: 'center',
-                headerTitle: (props) => (<SText textStyle={{ fontSize: 18, color: Colors.white }} size={Sizes.normal}>Settings</SText>),
-                headerStyle: { backgroundColor: '#161616' },
+                headerTitle: (props) => (<SText textStyle={{ fontSize: 18, color: Colors.light }} size={Sizes.normal}>Settings</SText>),
+                headerStyle: { backgroundColor: Colors.lightBlack },
                 headerBackTitleVisible: false,
-                headerTitleStyle: { color: Colors.white },
+                headerTitleStyle: { color: Colors.light },
                 headerShadowVisible: false,
                 headerBlurEffect: 'dark',
                 // headerLeft: (props) => (
@@ -53,13 +53,13 @@ const Settings = () => {
                 // )
             }}
             />
-            <GestureHandlerRootView style={{ flex: 1, backgroundColor: Colors.dark, }}>
+            <GestureHandlerRootView style={{ flex: 1, backgroundColor: Colors.black, }}>
                 <ScrollView contentContainerStyle={{ flex: 1, paddingTop: 20, paddingBottom: insets.bottom + 40, gap: 10 }}>
-                    <TouchableOpacity onPress={() => langBottomSheetRef.current?.collapse()} activeOpacity={0.8} style={{ backgroundColor: '#161616', marginHorizontal: 20, paddingVertical: 15, paddingHorizontal: 15, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', borderRadius: 15 }}>
-                        <SText size={Sizes.normal} textStyle={{ color: Colors.white, fontSize: 18 }}>Language</SText>
+                    <TouchableOpacity onPress={() => langBottomSheetRef.current?.collapse()} activeOpacity={0.8} style={{ backgroundColor: Colors.lightBlack, marginHorizontal: 20, paddingVertical: 15, paddingHorizontal: 15, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', borderRadius: 15 }}>
+                        <SText size={Sizes.normal} textStyle={{ color: Colors.light, fontSize: 18 }}>Language</SText>
                         <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 10 }}>
-                            <SText size={Sizes.normal} textStyle={{ color: Colors.grey, fontSize: 18 }}>{lang?.lang}</SText>
-                            <FontAwesome6 name="chevron-right" size={16} color={Colors.grey} />
+                            <SText size={Sizes.normal} textStyle={{ color: Colors.lightGrey, fontSize: 18 }}>{lang?.lang}</SText>
+                            <FontAwesome6 name="chevron-right" size={16} color={Colors.lightGrey} />
                         </View>
                     </TouchableOpacity>
                     <TouchableOpacity onPress={() => {
@@ -67,14 +67,14 @@ const Settings = () => {
                         dispatch(clearUser())
                         dispatch(clearSchedule())
                     }
-                    } activeOpacity={0.8} style={{ backgroundColor: '#161616', marginHorizontal: 20, paddingVertical: 15, paddingHorizontal: 10, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', borderRadius: 15 }}>
-                        <SText size={Sizes.normal} textStyle={{ color: Colors.orange, fontSize: 18, textAlign: 'center' }}>Log out</SText>
+                    } activeOpacity={0.8} style={{ backgroundColor: Colors.lightBlack, marginHorizontal: 20, paddingVertical: 15, paddingHorizontal: 10, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', borderRadius: 15 }}>
+                        <SText size={Sizes.normal} textStyle={{ color: Colors.red, fontSize: 18, textAlign: 'center' }}>Log out</SText>
                     </TouchableOpacity>
 
                 </ScrollView>
                 <View style={{ position: 'absolute', bottom: insets.bottom + 60, width: '100%' }}>
                     <TouchableOpacity onPress={() => Linking.openURL('https://t.me/Slavateplov13')} activeOpacity={0.8} style={{}}>
-                        <SText size={Sizes.normal} textStyle={{ color: Colors.white, fontSize: 14, textAlign: 'center', textDecorationLine: 'underline' }}>developed by Teplov Vyacheslav</SText>
+                        <SText size={Sizes.normal} textStyle={{ color: Colors.light, fontSize: 14, textAlign: 'center', textDecorationLine: 'underline' }}>developed by Teplov Vyacheslav</SText>
                     </TouchableOpacity>
                 </View>
                 <BottomSheetContainer
@@ -82,19 +82,20 @@ const Settings = () => {
                     index={-1}
                     style={{ borderRadius: 40, overflow: "hidden", }}
                     containerStyle={{ borderRadius: 40, }}
+                    backgroundStyle={{backgroundColor:Colors.lightBlack}}
                     backdropComponent={(props: any) => (
                         <Backdrop  {...props} opacity={0.8} disappearsOnIndex={-1} appearsOnIndex={0} />)}
                     handleIndicatorStyle={{ display: "none", }}>
                     <View style={{ padding: 10, paddingTop: 10, paddingBottom: insets.bottom + 80 }}>
-                        <SText size={Sizes.bold} textStyle={{ textAlign: 'center', fontSize: 18, marginBottom: 20 }}>Choose language</SText>
+                        <SText size={Sizes.bold} textStyle={{ textAlign: 'center', fontSize: 18, marginBottom: 20, color:Colors.light }}>Choose language</SText>
                         {langList.map((language, i) => (
                             <TouchableOpacity key={i} onPress={() => {
                                 addValue('language', language)
                                 lang?.changeLang(language)
                                 langBottomSheetRef.current?.close()
-                            }} style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', padding: lang?.lang === language ? 10 : 15, backgroundColor: Colors.lightGrey, marginBottom: 5, paddingHorizontal: 20, borderRadius: 15 }}>
-                                <SText size={Sizes.normal} textStyle={{ fontSize: 16 }}>{language}</SText>
-                                {lang?.lang === language && <MaterialIcons name="done" size={24} color="#6b99c3" />}
+                            }} style={{ flexDirection: 'row',marginHorizontal:10, alignItems: 'center', justifyContent: 'space-between', padding: lang?.lang === language ? 10 : 15, backgroundColor: Colors.black, marginBottom: 5, paddingHorizontal: 20, borderRadius: 15 }}>
+                                <SText size={Sizes.normal} textStyle={{ fontSize: 16,color: lang?.lang === language ? Colors.green : Colors.lightGrey}}>{language}</SText>
+                                {lang?.lang === language && <MaterialIcons name="done" size={24} color={Colors.green} />}
                             </TouchableOpacity>
                         ))}
                     </View>

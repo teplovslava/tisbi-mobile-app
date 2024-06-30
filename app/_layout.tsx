@@ -7,6 +7,7 @@ import store from '../store/index'
 import { Provider } from 'react-redux'
 import { Provider as AuthProvider } from '@/context/Auth';
 import { View } from 'react-native';
+import Colors from '@/constants/Colors';
 
 
 export {
@@ -45,7 +46,7 @@ export default function RootLayout() {
 
 function RootLayoutNav() {
   return (
-    <View style={{flex:1, backgroundColor:'#000'}}>
+    <View style={{flex:1, backgroundColor:Colors.black}}>
       <AuthProvider>
       <Provider store={store}>
         <LanguageContext>

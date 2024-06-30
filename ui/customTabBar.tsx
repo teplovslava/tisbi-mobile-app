@@ -71,6 +71,7 @@ const TabBar = (props: IProps) => {
 
         return (
           <TouchableOpacity
+            activeOpacity={1}
             accessibilityRole="button"
             accessibilityState={isFocused ? { selected: true } : {}}
             accessibilityLabel={options.tabBarAccessibilityLabel}
@@ -79,8 +80,8 @@ const TabBar = (props: IProps) => {
             key={route.key}
             style={{paddingBottom:5, alignItems:'center', justifyContent:'center', gap:5}}
           >
-            <FontAwesome6 name={icons[index]} size={20} color={isFocused ? Colors.secondary : Colors.grey}/>
-            <SText textStyle={{ fontSize: 12, color:isFocused ? Colors.secondary : Colors.grey }} size={Sizes.normal}>
+            <FontAwesome6 name={icons[index]} size={20} color={isFocused ? Colors.main : Colors.lightGrey}/>
+            <SText textStyle={{ fontSize: 12, color:isFocused ? Colors.main : Colors.lightGrey }} size={Sizes.normal}>
               {label as string}
             </SText>
             {
@@ -103,6 +104,7 @@ const styles = StyleSheet.create({
   container: {
     width: '100%',
     position: 'absolute',
+    backgroundColor:'transparent'
 
   },
   blur:{

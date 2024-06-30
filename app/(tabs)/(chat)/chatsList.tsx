@@ -25,11 +25,11 @@ const ChatsList = () => {
         headerShown: true,
         headerTitleAlign: 'center',
         headerTitle: (props) => (<View style={{ flexDirection: 'column', alignItems: 'center', justifyContent: 'center'}}>
-        <SText numberOfLines={1} textStyle={{ fontSize: 18, color: Colors.white, textAlign:'center', width:260 }} size={Sizes.normal}>{name}</SText>
+        <SText numberOfLines={1} textStyle={{ fontSize: 18, color: Colors.light, textAlign:'center', width:260 }} size={Sizes.normal}>{name ? name : 'Без названия'}</SText>
         <SText numberOfLines={1} textStyle={{ fontSize: 12, color: '#505050', width: '100%', textAlign: 'center' }} size={Sizes.normal}>{isReady ? '' : 'Connecting...'}</SText>
     </View>),
-        headerStyle: { backgroundColor: '#161616' },
-        headerTitleStyle: { color: Colors.white },
+        headerStyle: { backgroundColor: Colors.lightBlack },
+        headerTitleStyle: { color: Colors.light },
         headerShadowVisible: false,
         headerBackTitleVisible: false,
         headerBackVisible:false,
@@ -37,7 +37,7 @@ const ChatsList = () => {
           <TouchableOpacity onPress={() => {
             router.back()
           }} {...props}>
-            <Ionicons name="chevron-back-outline" size={28} color="#6b99c3" />
+            <Ionicons name="chevron-back-outline" size={28} color={Colors.main} />
           </TouchableOpacity>
         ),
         headerBlurEffect: 'dark',
@@ -48,7 +48,7 @@ const ChatsList = () => {
         // ),
       }}
       />
-      <View style={{ flex: 1, backgroundColor: Colors.dark, gap: 10 }}>
+      <View style={{ flex: 1, backgroundColor: Colors.black, gap: 10 }}>
         <FlatList
           data={list || []}
           renderItem={({item}) => <ChatList info={item} key={item.chat.ID} text={item.chat.ChatName} count={item.chat.UnreadCnt} />}

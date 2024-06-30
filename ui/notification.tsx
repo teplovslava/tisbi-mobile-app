@@ -1,6 +1,7 @@
 import { StyleSheet, Text, View } from 'react-native'
 import React from 'react'
 import SText, { Sizes } from '@/components/StyledText'
+import Colors from '@/constants/Colors'
 
 const Notification = ({ notification }: { notification: string }) => {
     return (
@@ -24,6 +25,6 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         borderRadius: 20,
-        backgroundColor: '#CCFF00',
+        backgroundColor: Colors.green,
     }
 })

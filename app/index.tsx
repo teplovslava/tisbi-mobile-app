@@ -132,45 +132,46 @@ export default function Auth() {
 
 
   return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
-      <StatusBar style={open ? "light" : "dark"} />
+    <GestureHandlerRootView style={{ flex: 1, backgroundColor:Colors.black }}>
+      <StatusBar style={"light" } />
       <KeyboardAvoidingView style={{ flex: 1 }} behavior='padding'>
         <View
-          style={{ flex: 1, backgroundColor: Colors.white, padding: 20, alignItems: "center", justifyContent: "center" }}
+          style={{ flex: 1, backgroundColor: Colors.black, padding: 20, alignItems: "center", justifyContent: "center" }}
         >
+          
+          <View style={{ width: "100%", marginHorizontal: 10, gap: 15 }}>
           {
-            savedAuthData && <SText textStyle={{ fontSize: 20, textAlign: "center", marginBottom: 5 }} size={Sizes.normal}>
+            savedAuthData && <SText textStyle={{ fontSize: 20, color:Colors.light, textAlign: "center",marginBottom:-10}} size={Sizes.normal}>
               {savedAuthData},
             </SText>
           }
-          <View style={{ width: "100%", marginHorizontal: 10, gap: 15 }}>
 
-            <SText textStyle={{ fontSize: 20, textAlign: "center", marginBottom: 20 }} size={Sizes.normal}>
+            <SText textStyle={{ fontSize: 20, color:Colors.light, textAlign: "center", marginBottom: 20 }} size={Sizes.normal}>
               Welcome !
             </SText>
             <Input change={(val: string) => setLogin(val)} containerStyleProps={{ width: "100%" }} placeHolder={currLang?.lang === 'Русский' ? 'Логин/Е-маил' : 'Login/Email'} icon1={
-              <View style={{ paddingVertical: 8, paddingHorizontal: 10, borderRadius: 14, backgroundColor: Colors.white }}>
-                <FontAwesome name="user" size={20} color="black" />
+              <View style={{ paddingVertical: 8, paddingHorizontal: 10, borderRadius: 14, backgroundColor: Colors.secondaryDark }}>
+                <FontAwesome name="user" size={20} color={Colors.darkGrey} />
               </View>
             }
             />
             <InputPass change={(val: string) => setPass(val)} containerStyleProps={{ width: "100%" }} placeHolder={currLang?.lang === 'Русский' ? 'Пароль' : "Password"} icon1={
-              <View style={{ paddingVertical: 8, paddingHorizontal: 10, borderRadius: 14, backgroundColor: Colors.white }}>
-                <Octicons name="lock" size={20} color="black" />
+              <View style={{ paddingVertical: 8, paddingHorizontal: 10, borderRadius: 14, backgroundColor: Colors.secondaryDark }}>
+                <Octicons name="lock" size={20} color={Colors.darkGrey} />
               </View>
             }
-              icon2={<Feather name="eye" size={16} color="black" />}
-              icon3={<Feather name="eye-off" size={16} color="black" />}
+              icon2={<Feather name="eye" size={16} color={Colors.darkGrey} />}
+              icon3={<Feather name="eye-off" size={16} color={Colors.darkGrey} />}
               secret={true}
             />
             <View style={{ paddingHorizontal: 10, paddingVertical: 5, borderRadius: 12, marginHorizontal: 20 }}>
-              <SText size={Sizes.normal} textStyle={{ color: Colors.dark, fontSize: 12, textAlign: 'center' }}>For log in to the application, use your credentials from the personal account of the ISU University</SText>
+              <SText size={Sizes.normal} textStyle={{ color: Colors.lightGrey, fontSize: 12, textAlign: 'center' }}>For log in to the application, use your credentials from the personal account of the ISU University</SText>
             </View>
             <Button
               disabled={login.length < 2 || pass.length < 7}
               handler={() => handleLogin(login, pass)}
-              buttonStyleProps={{ backgroundColor: Colors.dark, marginTop: 30, opacity: (login.length < 2 || pass.length < 7) ? 0.1 : 1 }}
-              textStyleProps={{ textAlign: "center", color: Colors.light }}
+              buttonStyleProps={{ backgroundColor: Colors.light, marginTop: 30, opacity: (login.length < 2 || pass.length < 7) ? 0.1 : 1 }}
+              textStyleProps={{ textAlign: "center", color: Colors.dark }}
             >
               Enter
             </Button>
@@ -182,13 +183,14 @@ export default function Auth() {
                 }}
                 style={{marginTop:10}}
               >
-                <SText textStyle={[{color: Colors.dark, textAlign:'center', fontSize:14} ]} size={Sizes.normal}>Выйти из учетной записи {savedAuthData}</SText>
+                <SText textStyle={[{color: Colors.dangerous, textAlign:'center', fontSize:14} ]} size={Sizes.normal}>Выйти из учетной записи {savedAuthData}</SText>
               </TouchableOpacity>
             }
           </View>
         </View>
       </KeyboardAvoidingView>
       <BottomSheetContainer
+        backgroundStyle={{backgroundColor:Colors.lightBlack}}
         index={-1} refer={bottomSheetRef}
         style={{ borderRadius: 40, overflow: "hidden" }}
         containerStyle={{ margin: 20, borderRadius: 40, marginBottom: insets.bottom + 10, }}
@@ -199,7 +201,7 @@ export default function Auth() {
         )}
       >
         <View style={{ flex: 1, margin: 20, marginTop: 0 }}>
-          <SText textStyle={styles.textStyle} size={Sizes.normal}>
+          <SText textStyle={[styles.textStyle,{color:Colors.light}]} size={Sizes.normal}>
             Choose role
           </SText>
           <View style={{ gap: 10 }}>
@@ -210,8 +212,8 @@ export default function Auth() {
                 setCurrentRole(role.peopleRoleId)
               }
               } activeOpacity={0.7} key={role.peopleRoleId}
-                buttonStyleProps={{ backgroundColor: currentRole === role.peopleRoleId ? Colors.main : Colors.lightGrey }}
-                textStyleProps={{ color: currentRole === role.peopleRoleId ? Colors.white : Colors.grey }}
+                buttonStyleProps={{ backgroundColor: currentRole === role.peopleRoleId ? Colors.main : Colors.black }}
+                textStyleProps={{ color: currentRole === role.peopleRoleId ? Colors.light : Colors.light }}
               >
                 {role.roleTypeName}
               </Button>
@@ -229,7 +231,7 @@ export default function Auth() {
         </View>
       </BottomSheetContainer>
       {loading && <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,.75)', position: 'absolute', zIndex: 100000000000, top: 0, left: 0, right: 0, bottom: 0, alignItems: 'center', justifyContent: 'center' }}>
-        <View style={{ backgroundColor: Colors.white, borderRadius: 40, padding: 20 }}>
+        <View style={{ backgroundColor: Colors.lightGrey, borderRadius: 40, padding: 20 }}>
           <Loader />
         </View>
       </View>}

@@ -38,12 +38,12 @@ export const Input = ({
 
   return (
     <View
-      style={[styles.container,containerStyleProps,{ backgroundColor: Colors.lightGrey },]}
+      style={[styles.container,containerStyleProps,{ backgroundColor: Colors.dark },]}
     >
       {icon1 && icon1}
       <TextInput
         {...props}
-        placeholderTextColor={Colors.grey}
+        placeholderTextColor={Colors.darkGrey}
         style={[styles.input, styleProps]}
         onChangeText={(value) => {
           setVal(value)
@@ -73,12 +73,12 @@ export const InputPass = ({
   const [val, setVal] = useState<string | null>();
   const [visible, setVisible] = useState<boolean>(secret)
   return (
-    <View style={[styles.container,containerStyleProps,{ backgroundColor: Colors.lightGrey },]}
+    <View style={[styles.container,containerStyleProps,{ backgroundColor: Colors.dark },]}
     >
       {icon1 && icon1}
       <TextInput
         {...props}
-        placeholderTextColor={Colors.grey}
+        placeholderTextColor={Colors.darkGrey}
         style={[styles.input, styleProps]}
         onChangeText={(value) => {
           setVal(value)
@@ -112,6 +112,7 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 16,
     paddingVertical: 18,
-    fontFamily:'GilroyRegular'
+    fontFamily:'GilroyRegular',
+    color:Colors.lightGrey
   },
 });

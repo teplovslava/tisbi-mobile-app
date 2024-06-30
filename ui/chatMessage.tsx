@@ -11,6 +11,7 @@ import * as Haptics from 'expo-haptics';
 import { normalizeAnsweredMessage } from '@/service/normalizeAnsweredMessage'
 import { FontAwesome } from '@expo/vector-icons';
 import { FileView } from './File'
+import { LinearGradient } from 'expo-linear-gradient'
 
 
 interface IProps {
@@ -216,26 +217,28 @@ const ChatMessage = ({ newDate, samePrev, sameNext, message,isMyMessage, setMess
                             <TouchableOpacity
                                 onPress={setMessageChoosed}
                                 activeOpacity={1}
-                                style={[styles.container,
-                                {
-                                    backgroundColor: isMyMessage ? '#00bedb' : Colors.secondaryDark,
+                                style={[styles.container]}
+                                onLongPress={longPress}
+                            >
+                               <LinearGradient
+                               colors={isMyMessage ? [Colors.violet,Colors.main, Colors.main] : ['#19181e',Colors.lightBlack]} 
+                               end={{x:1, y:1}}
+                               style={[styles.containerInner,{
                                     alignItems: isMyMessage ? 'flex-end' : 'flex-start',
                                     borderTopRightRadius: samePrev && isMyMessage ? 10 : 25,
                                     borderBottomRightRadius: sameNext && isMyMessage ? 10 : 25,
                                     borderTopLeftRadius: samePrev && !isMyMessage ? 10 : 25,
                                     borderBottomLeftRadius: sameNext && !isMyMessage ? 10 : 25
-                                }]}
-                                onLongPress={longPress}
-                            >
-                                {!samePrev && <SText size={Sizes.normal} textStyle={{ fontSize: 12, color: isMyMessage ? 'white' : '#6C6C6C', }}>{isMyMessage ? 'Вы' : message.MemberName}</SText>}
+                                }]}>
+                                {!samePrev && <SText size={Sizes.normal} textStyle={{ fontSize: 12, color: isMyMessage ? Colors.light : '#6C6C6C', }}>{isMyMessage ? 'Вы' : message.MemberName}</SText>}
                                 {
                                     message.QuotesInfo && <View style={{ flexDirection: 'column', gap: 5, width: '100%' }}>
                                         {
                                             normalizeAnsweredMessage(message.QuotesInfo).map((str, i) => {
-                                                return <TouchableOpacity disabled={isChooseMode} onPress={() => onQuotaClick(str.MsgSourceID)} key={`${str.ID}${str.MsgSourceID}${str.MemberName}`} style={{ flexDirection: 'row', gap: 10, backgroundColor: Colors.dark, paddingHorizontal: 20, paddingVertical: 10, paddingLeft: 10, borderRadius: 10 }}>
-                                                    <View style={{ width: 2, backgroundColor: '#CCFF00', alignItems: 'stretch' }}></View>
+                                                return <TouchableOpacity disabled={isChooseMode} onPress={() => onQuotaClick(str.MsgSourceID)} key={`${str.ID}${str.MsgSourceID}${str.MemberName}`} style={{ flexDirection: 'row', gap: 10, backgroundColor: 'rgba(0,0,0,0.45)', paddingHorizontal: 20, paddingVertical: 10, paddingLeft: 10, borderRadius: 10 }}>
+                                                    <View style={{ width: 2, backgroundColor: Colors.green, alignItems: 'stretch', borderRadius:1 }}></View>
                                                     <View style={{ flexDirection: 'column', alignItems: 'flex-start', gap: 5, }}>
-                                                        <SText size={Sizes.normal} textStyle={{ color: Colors.grey, fontSize: 14, }}>{str.MemberName}</SText>
+                                                        <SText size={Sizes.normal} textStyle={{ color: Colors.lightGrey, fontSize: 14, }}>{str.MemberName}</SText>
                                                         <SText size={Sizes.normal} textStyle={{ color: 'white', fontSize: 14, maxWidth: '95%' }} numberOfLines={1}>{str.Msg || 'Вложение'}</SText>
                                                     </View>
                                                 </TouchableOpacity>
@@ -243,10 +246,13 @@ const ChatMessage = ({ newDate, samePrev, sameNext, message,isMyMessage, setMess
                                         }
                                     </View>
                                 }
-                                {message.Msg && <SText size={Sizes.normal} textStyle={{ fontSize: 14, color: isMyMessage ? 'black' : '#fff' }}>{message.Msg}</SText>}
+                                {message.Msg && <SText size={Sizes.normal} textStyle={{ fontSize: 14, color: Colors.light }}>{message.Msg}</SText>}
 
-                                {message.AttachmentInfo && files.map((file: string, i: number) => file.length ? <FileView key={i} isChooseMode={isChooseMode} file={file} /> : null)}
+                                {message.AttachmentInfo && <View style={{gap:3, width:'100%'}}>
+                                    {files.map((file: string, i: number) => file.length ? <FileView key={i} isChooseMode={isChooseMode} file={file} /> : null)}
+                                    </View>}
                                 <SText size={Sizes.normal} textStyle={{ fontSize: 10, color: isMyMessage ? 'white' : '#6C6C6C', marginRight:isMyMessage ? -5 : 0, marginLeft: isMyMessage ? 0 : -5 }}>{isChanged ? 'изменено' : ''} {DateEdit ? DateEdit : DateAdd}</SText>
+                                </LinearGradient>
                             </TouchableOpacity>
                         </Animated.View>
 
@@ -275,12 +281,15 @@ const styles = StyleSheet.create({
         backgroundColor: 'red'
     },
     container: {
+        width: 'auto',
+
+    },
+    containerInner:{
         padding: 20,
         paddingBottom: 10,
         borderTopLeftRadius: 25,
         borderBottomLeftRadius: 25,
         backgroundColor: Colors.secondaryDark,
         gap: 10,
-        width: 'auto',
     }
 })

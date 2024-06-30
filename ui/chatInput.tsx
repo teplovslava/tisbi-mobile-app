@@ -29,7 +29,7 @@ const ChatInput = ({reff, handler, disabled }:
             />
             <Animated.View style={animatedStyles}>
                 <TouchableOpacity disabled={disabled}  onPress={() => {handler(value); setValue('')}} style={{ borderRadius: 50, backgroundColor: Colors.blue, padding: 9, opacity:disabled ? 0.5 : 1 }}>
-                    <Ionicons name="send" size={20} color={Colors.white} />
+                    <Ionicons name="send" size={20} color={Colors.light} />
                 </TouchableOpacity>
             </Animated.View>
         </View>
@@ -47,7 +47,7 @@ const styles = StyleSheet.create({
         borderRadius: 20,
         borderWidth: 0.2,
         fontSize: 16,
-        color: Colors.white,
-        backgroundColor: Colors.dark
+        color: Colors.light,
+        backgroundColor: Colors.black
     }
 })

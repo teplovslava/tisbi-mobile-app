@@ -48,36 +48,36 @@ const DetailsItem = () => {
         <View style={{backgroundColor:contTypeColors[details.contactTypeId], paddingVertical:10,paddingHorizontal:20, marginBottom:20, borderRadius:20}}> 
             <SText size={Sizes.normal} textStyle={{color:Colors.dark}}>{lessonTypes[details.contactTypeId]}</SText>
         </View>
-        <SText size={Sizes.bold} textStyle={{fontSize:24, textAlign:'center', marginBottom:20}}>{details.sectName}</SText>
-        <SText size={Sizes.normal} textStyle={{marginBottom:20, color:Colors.grey}}>{details.placeName}</SText>
+        <SText size={Sizes.bold} textStyle={{fontSize:24, textAlign:'center', marginBottom:20, color:Colors.light}}>{details.sectName}</SText>
+        <SText size={Sizes.normal} textStyle={{marginBottom:20, color:Colors.darkGrey}}>{details.placeName}</SText>
         <View style={{gap:10,width:'100%'}}>
-        <View style={{backgroundColor:Colors.lightGrey, padding:20, width:'100%', flexDirection:'row', alignItems:'center', gap:20, borderRadius:25}}>
-            <AntDesign name="clockcircleo" size={24} color="black" />
+        <View style={{backgroundColor:Colors.black, padding:20, width:'100%', flexDirection:'row', alignItems:'center', gap:20, borderRadius:25}}>
+            <AntDesign name="clockcircleo" size={24} color={Colors.light} />
             <View style={{flexDirection:'row', alignItems:'center'}}>
-                <SText size={Sizes.normal} textStyle={{fontSize:16}}>{details.start.split('T')[1].slice(0, 5)}</SText>
-                <SText size={Sizes.normal} textStyle={{fontSize:16}}>-</SText>
-                <SText size={Sizes.normal} textStyle={{fontSize:16}}>{details.finish.split('T')[1].slice(0, 5)}</SText>
+                <SText size={Sizes.normal} textStyle={{fontSize:16, color:Colors.light}}>{details.start.split('T')[1].slice(0, 5)}</SText>
+                <SText size={Sizes.normal} textStyle={{fontSize:16, color:Colors.light}}>-</SText>
+                <SText size={Sizes.normal} textStyle={{fontSize:16, color:Colors.light}}>{details.finish.split('T')[1].slice(0, 5)}</SText>
             </View>
         </View>
-        <View style={{backgroundColor:Colors.lightGrey, padding:20, width:'100%', flexDirection:'row', alignItems:'center', gap:20, borderRadius:25}}>
-        {role === 'Преподаватель' ? <FontAwesome name="group" size={24} color="black" /> : <FontAwesome name="user-o" size={24} color="black" />}
+        <View style={{backgroundColor:Colors.black, padding:20, width:'100%', flexDirection:'row', alignItems:'center', gap:20, borderRadius:25}}>
+        {role === 'Преподаватель' ? <FontAwesome name="group" size={24} color={Colors.light} /> : <FontAwesome name="user-o" size={24} color={Colors.light} />}
             <View style={{flexDirection:'row', alignItems:'center'}}>
-                <SText numberOfLines={1} size={Sizes.normal} textStyle={{fontSize:16}}>{role === 'Преподаватель' ? details.threadName: details.staffName}</SText>
+                <SText numberOfLines={1} size={Sizes.normal} textStyle={{fontSize:16, color:Colors.light}}>{role === 'Преподаватель' ? details.threadName: details.staffName}</SText>
             </View>
         </View>
-        {details.extId &&  <View style={{backgroundColor:Colors.lightGrey, padding:20, width:'100%', flexDirection:'row', alignItems:'center', gap:20, borderRadius:25}}>
-        <Ionicons name="videocam-outline" size={24} color="black" />
+        {details.extId &&  <View style={{backgroundColor:Colors.black, padding:20, width:'100%', flexDirection:'row', alignItems:'center', gap:20, borderRadius:25}}>
+        <Ionicons name="videocam-outline" size={24} color={Colors.light} />
             <View style={{flexDirection:'row', alignItems:'center',flex:1}}>
-                <SText numberOfLines={1} size={Sizes.normal} textStyle={{fontSize:16}}>{details.lessonTypeName}</SText>
+                <SText numberOfLines={1} size={Sizes.normal} textStyle={{fontSize:16, color:Colors.light}}>{details.lessonTypeName}</SText>
                 <TouchableOpacity disabled={loading} onPress={()=> getLessonLink(details.extId)} activeOpacity={0.7} style={{paddingVertical:loading ? 7 : 10, paddingHorizontal:20, borderRadius:25, marginLeft:'auto', backgroundColor:Colors.dark}}>
-                {loading ? <ActivityIndicator  size={'small'}/> :<SText size={Sizes.normal} textStyle={{color:Colors.white}}>Enter</SText>}
+                {loading ? <ActivityIndicator  size={'small'}/> :<SText size={Sizes.normal} textStyle={{color:Colors.light}}>Enter</SText>}
                 </TouchableOpacity>
             </View>
         </View>}
-        <View style={{backgroundColor:Colors.lightGrey, padding:20, width:'100%', flexDirection:'row', alignItems:'center', gap:20, borderRadius:25}}>
-        <SimpleLineIcons name="location-pin" size={24} color="black" />
+        <View style={{backgroundColor:Colors.black, padding:20, width:'100%', flexDirection:'row', alignItems:'center', gap:20, borderRadius:25}}>
+        <SimpleLineIcons name="location-pin" size={24} color={Colors.light} />
             <View style={{flexDirection:'row', alignItems:'center'}}>
-                <SText numberOfLines={1} size={Sizes.normal} textStyle={{fontSize:16}}>{details.name}, {details.code}</SText>
+                <SText numberOfLines={1} size={Sizes.normal} textStyle={{fontSize:16, color:Colors.light}}>{details.name}, {details.code}</SText>
             </View>
         </View>
         </View>

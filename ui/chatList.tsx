@@ -27,7 +27,7 @@ const ChatList = ({info, text, count }: IProps) => {
             style={styles.container} >
             <View style={styles.header}>
                 <View style={{ flexGrow: 0, flexShrink: 0, width: '80%' }}>
-                    <SText textStyle={{ fontSize: 18, color: Colors.white }} size={Sizes.bold}>{text}</SText>
+                    <SText textStyle={{ fontSize: 18, color: Colors.light }} size={Sizes.bold}>{text}</SText>
                 </View>
                 {!!count && <View style={styles.notific}>
                     <SText textStyle={{ fontSize: 12, color: Colors.dark }} size={Sizes.normal}>{String(count)}</SText>
@@ -41,13 +41,13 @@ export default ChatList
 
 const styles = StyleSheet.create({
     container: {
-        backgroundColor: Colors.secondaryDark,
+        backgroundColor: Colors.lightBlack,
         padding: 20,
         borderRadius: 20,
         flexDirection: 'column',
     },
     notific: {
-        backgroundColor: '#CCFF00',
+        backgroundColor: Colors.green,
         padding: 5,
         borderRadius: 20,
         flexDirection: 'row',

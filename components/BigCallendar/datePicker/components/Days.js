@@ -2,6 +2,7 @@ import React, {useState, useMemo} from 'react';
 import {View, Text, StyleSheet, TouchableOpacity} from 'react-native';
 
 import {useCalendar} from '../DatePicker';
+import Colors from '@/constants/Colors';
 
 const Days = () => {
   const {options, state, utils, onDateChange} = useCalendar();
@@ -79,12 +80,12 @@ const styles = theme =>
     dayText: {
       fontFamily: 'GilroyRegular',
       fontSize: theme.textFontSize,
-      color: 'black',
+      color: Colors.light,
       textAlign: 'center',
       width: '100%',
     },
     dayTextSelected: {
-      color: 'black',
+      color: Colors.main,
       fontFamily: theme.headerFont,
     },
     dayTextDisabled: {

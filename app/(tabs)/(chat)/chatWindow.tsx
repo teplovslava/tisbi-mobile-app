@@ -25,6 +25,7 @@ import { normalizeAnsweredMessage } from '@/service/normalizeAnsweredMessage'
 import { FileView } from '@/ui/File'
 import dayjs from 'dayjs'
 import * as Clipboard from 'expo-clipboard';
+import ChatSceleton from '@/ui/chatSceleton'
 
 
 
@@ -113,7 +114,7 @@ const chatWindow = () => {
         }
     }
 
-    const sendEditMessage = (message: string) => {
+    const sendEditMessage = useCallback((message: string) => {
         if (message.trim()) {
             currentMessage.current = message
             ws?.send(JSON.stringify({
@@ -128,10 +129,10 @@ const chatWindow = () => {
             flatListRef.current?.scrollToIndex({ animated: true, index: 0 })
         }
         setEditMode(false)
-    }
+    },[])
 
 
-    const sendMessage = (message: string) => {
+    const sendMessage = useCallback((message: string) => {
         if (message.trim()) {
             currentMessage.current = message
             ws?.send(JSON.stringify({
@@ -145,7 +146,7 @@ const chatWindow = () => {
             setChoosedMessage([])
             flatListRef.current?.scrollToIndex({ animated: true, index: 0 })
         }
-    }
+    },[])
 
     const deleteMessage = () => {
         actionListPosition.value = {
@@ -180,6 +181,7 @@ const chatWindow = () => {
         }));
 
     }
+
 
     const fixMessage = () => {
         ws?.send(JSON.stringify({
@@ -511,17 +513,19 @@ const chatWindow = () => {
         const nextItem = index >= 0 ? messages ? messages[messages?.length - index] : null : null;
 
         const prevDate = prevItem ?  dayjs(prevItem.DateAdd).format(`DD MMMM`) : null
+        const nextDate = nextItem ?  dayjs(nextItem.DateAdd).format(`DD MMMM`) : null
         const todayDate = dayjs(item.DateAdd).format(`DD MMMM`)
 
         const newDate = prevDate !== todayDate ? true : false
+        const newDateNext = nextDate !== todayDate ? true : false
 
         const isMyMessage = history?.user?.roleId === item?.PeopleRoleID
 
         if (item.Status === 2 || item.Status === 3) {
             return <ChatMessage
                 newDate = {newDate}
-                samePrev={prevItem?.PeopleRoleID === item.PeopleRoleID}
-                sameNext={nextItem?.PeopleRoleID === item.PeopleRoleID}
+                samePrev={prevItem?.PeopleRoleID === item.PeopleRoleID && !newDate}
+                sameNext={nextItem?.PeopleRoleID === item.PeopleRoleID && !newDateNext}
                 setMessageAndBelt={setMessageAndBelt}
                 scrolledMessage={scrolledMessageID === item.ID}
                 onQuotaClick={scrollToMessage}
@@ -539,7 +543,7 @@ const chatWindow = () => {
     }, [messages, scrolledMessageID, isChooseMode,choosedMessage]);
 
     return (
-        <View style={{ flex: 1, backgroundColor: Colors.dark }}>
+        <View style={{ flex: 1, backgroundColor: Colors.black }}>
             <Animated.View style={[hintStyleOverlay, { position: 'absolute', backgroundColor: 'rgba(0,0,0,0.25)', width: '100%', height: '100%', overflow: 'hidden', }]}>
                 <TouchableOpacity activeOpacity={1} onPress={overlayClick} style={{ width: '100%', height: '100%' }}>
                     <BlurView intensity={15} style={{ width: '100%', height: '100%', position: 'relative' }}>
@@ -589,11 +593,11 @@ const chatWindow = () => {
                 headerShown: true,
                 headerTitleAlign: 'center',
                 headerTitle: (props) => (<View style={{ flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: 230 }}>
-                    <SText numberOfLines={1} textStyle={{ fontSize: 18, color: Colors.white, width: '100%', }} size={Sizes.normal}>{chat[0].chat.GroupName}</SText>
-                    <SText numberOfLines={1} textStyle={{ fontSize: 12, color: '#505050', width: '100%', textAlign: 'center' }} size={Sizes.normal}>{isReady ? loading ? 'Обновление...' : chat[0].chat.ChatName : 'Connecting...'}</SText>
+                    <SText numberOfLines={1} textStyle={{ fontSize: 18, color: Colors.light, width: '100%', }} size={Sizes.normal}>{chat.length ? chat[0].chat.GroupName : ''}</SText>
+                    <SText numberOfLines={1} textStyle={{ fontSize: 12, color: Colors.lightGrey, width: '100%', textAlign: 'center' }} size={Sizes.normal}>{chat.length ? isReady ? loading ? 'Обновление...' : chat[0].chat.ChatName : 'Connecting...' : ''}</SText>
                 </View>),
-                headerStyle: { backgroundColor: '#161616' },
-                headerTitleStyle: { color: Colors.white },
+                headerStyle: { backgroundColor: Colors.lightBlack },
+                headerTitleStyle: { color: Colors.light },
                 headerShadowVisible: false,
                 headerBackTitleVisible: false,
                 headerBackVisible: false,
@@ -607,33 +611,38 @@ const chatWindow = () => {
                     </TouchableOpacity>
                 ),
                 headerLeft: (props) => (
-                    <TouchableOpacity onPress={() => router.back()} {...props}>
-                        <Ionicons name="chevron-back-outline" size={28} color="#6b99c3" />
+                    <TouchableOpacity onPress={() => {
+                        router.back()
+                        
+                    }} {...props}>
+                        <Ionicons name="chevron-back-outline" size={28} color={Colors.main} />
                     </TouchableOpacity>
                 ),
             }}
             />
-            <GestureHandlerRootView style={{ flex: 1, backgroundColor: Colors.secondaryDark, }}>
+            <GestureHandlerRootView style={{ flex: 1, backgroundColor: Colors.black, }}>
                 <KeyboardAvoidingView
                     behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
                     keyboardVerticalOffset={Platform.OS === 'ios' ? 60 : 87}
-                    style={{ flex: 1, backgroundColor: Colors.secondaryDark, position: 'relative' }}>
+                    style={{ flex: 1, backgroundColor: Colors.black, position: 'relative' }}>
                     {
                         loading || !isReady
-                            ? <View style={{ backgroundColor: Colors.dark, flex: 1, flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+                            ? <View style={{ backgroundColor: Colors.black, flex: 1, flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
                                 <Loader />
                             </View>
-                            : Boolean(messages?.length)
-                                ? <View style={{ backgroundColor: Colors.secondaryDark, flex: 1 }}>
+                            : 
+                            chat.length ? 
+                            Boolean(messages?.length)
+                                ? <View style={{ backgroundColor: Colors.lightBlack, flex: 1 }}>
                                     {
                                         history?.fixed && <TouchableOpacity onPress={() => scrollToMessage(history?.fixed.ID)} style={{ borderTopColor: 'black', borderTopWidth: 1, padding: 15, paddingVertical: 5, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 10 }}>
-                                            <AntDesign style={{ flexGrow: 0, flexShrink: 0 }} name="pushpino" size={20} color={Colors.white} />
+                                            <AntDesign style={{ flexGrow: 0, flexShrink: 0 }} name="pushpino" size={20} color={Colors.light} />
                                             <View style={{ flex: 1 }}>
-                                                <SText textStyle={{ color: Colors.grey, fontSize: 14, marginBottom: 5 }}>Закрепленное сообщение</SText>
-                                                <SText size={Sizes.normal} numberOfLines={1} textStyle={{ color: Colors.white, fontSize: 16 }}>{history?.fixed.Msg}</SText>
+                                                <SText textStyle={{ color: Colors.lightGrey, fontSize: 14, marginBottom: 5 }}>Закрепленное сообщение</SText>
+                                                <SText size={Sizes.normal} numberOfLines={1} textStyle={{ color: Colors.light, fontSize: 16 }}>{history?.fixed.Msg}</SText>
                                             </View>
                                             <TouchableOpacity onPress={() => unfixMessage(history?.fixed)} style={{ flexGrow: 0, flexShrink: 0 }}>
-                                                <AntDesign name="close" size={20} color={Colors.grey} />
+                                                <AntDesign name="close" size={20} color={Colors.lightGrey} />
                                             </TouchableOpacity>
                                         </TouchableOpacity>
                                     }
@@ -645,10 +654,11 @@ const chatWindow = () => {
                                         onScrollToIndexFailed={() => { }}
                                         inverted
                                         contentContainerStyle={{ padding: 15, flexDirection: 'column', }}
-                                        style={{ backgroundColor: Colors.dark }}
+                                        style={{ backgroundColor: Colors.black }}
+                                        removeClippedSubviews={true}
                                         data={reversedMessages}
                                         initialNumToRender={20}
-                                        maxToRenderPerBatch={20}
+                                        maxToRenderPerBatch={5}
                                         keyExtractor={item => item.ID.toString()}
                                         renderItem={renderItem}
                                         ListFooterComponent={() => {
@@ -657,15 +667,18 @@ const chatWindow = () => {
                                         }}
                                     />
                                 </View>
-                                : <View style={{ backgroundColor: Colors.dark, flex: 1, flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-                                    <SText size={Sizes.bold} textStyle={{ color: Colors.grey, fontSize: 16 }}>Сообщений пока нет</SText>
+                                : <View style={{ backgroundColor: Colors.black, flex: 1, flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+                                    <SText size={Sizes.bold} textStyle={{ color: Colors.light, fontSize: 16 }}>Сообщений пока нет</SText>
                                 </View>
+                                : <View style={{ backgroundColor: Colors.black, flex: 1, flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+                                <SText size={Sizes.bold} textStyle={{ color: Colors.light, fontSize: 16 }}>Чат устарел или не существует</SText>
+                            </View>
                     }
                     <Animated.View style={answeredMessageStyle}>
                         <AnsweredMessage choosedMessage={choosedMessage} clearAnsweredMessages={clearAnsweredMessages} />
                     </Animated.View>
 
-                    <View style={{ backgroundColor: Colors.secondaryDark, paddingBottom: insets.bottom + 10, position: 'relative' }}>
+                    <View style={{ backgroundColor: Colors.lightBlack, paddingBottom: insets.bottom + 10, position: 'relative' }}>
 
                         <Animated.View style={[buttonsFiledStyle, { flexDirection: 'row', paddingTop: 7, paddingBottom: 5, paddingHorizontal: 15, alignItems: 'center', gap: 10, justifyContent: 'center', position: 'absolute' }]}>
                             <TouchableOpacity style={[styles.helperBtn]} onPress={() => {
@@ -691,7 +704,7 @@ const chatWindow = () => {
                                 </TouchableOpacity> */}
                                 <ChatInput
                                     reff={chatInputRef}
-                                    disabled={Number(new Date(chat[0].chat.DateEnd)) < Number(new Date()) || !isReady}
+                                    disabled={Number(new Date(chat[0]?.chat?.DateEnd)) < Number(new Date()) || !isReady || !chat.length}
                                     handler={isEditMode ? sendEditMessage : sendMessage}
                                 />
                             </View>
@@ -712,11 +725,11 @@ const chatWindow = () => {
                         handleSheetChange(idx)
 
                     }}
-                    backgroundStyle={{ backgroundColor: '#161616' }}
+                    backgroundStyle={{ backgroundColor: Colors.lightBlack }}
                     snapPoints={['50%', '95%']}
                     enablePanDownToClose
                     ref={onlineUserBottomSheetRef}
-                    style={{ borderRadius: 40, overflow: "hidden", backgroundColor: '#161616' }}
+                    style={{ borderRadius: 40, overflow: "hidden", backgroundColor: Colors.lightBlack }}
                     containerStyle={{ borderRadius: 40 }}
                     backdropComponent={(props: any) => (
                         <Backdrop children={ <BlurView intensity={10} style={{flex:1, width:'100%', height:'100%'}}/>}  {...props} opacity={0.8} disappearsOnIndex={-1} appearsOnIndex={0} >

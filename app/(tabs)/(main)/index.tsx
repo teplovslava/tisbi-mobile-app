@@ -104,19 +104,19 @@ const Main = () => {
   return (
     <>
       <GestureHandlerRootView style={{ flex: 1,backgroundColor: Colors.dark, gap: 10,  }}>
-        <View style={{ flex: 1, backgroundColor: Colors.dark, gap: 10}}>
+        <View style={{ flex: 1, backgroundColor: Colors.black, gap: 10}}>
           <View style={{ marginTop: insets.top + 20, paddingHorizontal: 20, flex: 1 }}>
             <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 40 }}>
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5 }}>
-                <SText size={Sizes.bold} textStyle={{ color: Colors.white, fontSize: 28 }}>{dayjs(currentDate).format('DD')}</SText>
-                <SText size={Sizes.normal} textStyle={{ color: '#6b99c3', fontSize: 28 }}>{dayjs(currentDate).format('MMMM')}</SText>
+                <SText size={Sizes.bold} textStyle={{ color: Colors.light, fontSize: 28 }}>{dayjs(currentDate).format('DD')}</SText>
+                <SText size={Sizes.normal} textStyle={{ color: Colors.main, fontSize: 28 }}>{dayjs(currentDate).format('MMMM')}</SText>
               </View>
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: 20 }}>
                 <TouchableOpacity onPress={() => router.push('/(tabs)/(main)/onlineSchedule')} style={{ padding: 5 }}>
-                  <Feather name="monitor" size={24} color={Colors.white} />
+                  <Feather name="monitor" size={24} color={Colors.light} />
                 </TouchableOpacity>
                 <TouchableOpacity style={{ padding: 5 }} onPress={toggleCalendar}>
-                  <Ionicons name="calendar-outline" size={24} color={isOpened ? '#6b99c3' : Colors.white} />
+                  <Ionicons name="calendar-outline" size={24} color={isOpened ? Colors.main : Colors.light} />
                 </TouchableOpacity>
               </View>
             </View>
@@ -128,7 +128,7 @@ const Main = () => {
                 loading ? (<View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}><Loader /></View>)
                   : !storedSchedule[currentDate]?.length
                     ? <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-                      <SText size={Sizes.normal} textStyle={{ color: Colors.white, fontSize: 18 }}>No lessons</SText>
+                      <SText size={Sizes.normal} textStyle={{ color: Colors.light, fontSize: 18 }}>No lessons</SText>
                       <Empty />
                     </View>
                     : <FlatList
@@ -142,6 +142,7 @@ const Main = () => {
             </View>
           </View>
           <BottomSheetContainer
+            backgroundStyle={{backgroundColor:Colors.lightBlack}}
             refer={bottomRef}
             enablePanDownToClose
             style={{ borderTopLeftRadius: 40, borderTopRightRadius: 40, overflow: 'hidden', backgroundColor: '#00bf8f' }}
@@ -155,6 +156,7 @@ const Main = () => {
           <BottomSheetContainer
             index={-1}
             refer={calendarRef}
+            backgroundStyle={{backgroundColor:Colors.lightBlack}}
             style={{ borderRadius: 40, overflow: "hidden", padding: 15, paddingTop: 0 }}
             containerStyle={{ margin: 20, borderRadius: 40, marginBottom: insets.bottom + 60 }}
             backdropComponent={(props: any) => (
@@ -164,7 +166,7 @@ const Main = () => {
               <TouchableOpacity
                 onPress={closeCalendar}
                 style={{ padding: 2, backgroundColor: Colors.lightGrey, borderRadius: 100, marginLeft: 'auto', marginTop: 5, marginRight: 5 }}>
-                <Ionicons name="close" size={18} color={Colors.grey} />
+                <Ionicons name="close" size={18} color={Colors.dark} />
               </TouchableOpacity>
               <DatePicker
                 onDateChange={(date) => {
@@ -174,12 +176,12 @@ const Main = () => {
                 }}
                 isGregorian={currLang?.lang === 'English'}
                 options={{
-                  backgroundColor: 'white',
-                  textHeaderColor: '#085CFB',
+                  backgroundColor: Colors.lightBlack,
+                  textHeaderColor: Colors.main,
                   textDefaultColor: '#fff',
                   selectedTextColor: '#fff',
                   mainColor: '#085CFB',
-                  textSecondaryColor: 'grey',
+                  textSecondaryColor: Colors.darkGrey,
                   textFontSize: 12,
                   borderColor: 'transparent',
                 }}

@@ -29,12 +29,12 @@ export default function Chat() {
         headerBackVisible: false,
         headerTitleAlign: 'center',
         headerTitle: (props) => (<View style={{ flexDirection: 'column', alignItems: 'center', justifyContent: 'center'}}>
-        <SText numberOfLines={1} textStyle={{ fontSize: 18, color: Colors.white, textAlign:'center' }} size={Sizes.normal}>Forum</SText>
+        <SText numberOfLines={1} textStyle={{ fontSize: 18, color: Colors.light, textAlign:'center' }} size={Sizes.normal}>Forum</SText>
         <SText numberOfLines={1} textStyle={{ fontSize: 12, color: '#505050', width: '100%', textAlign: 'center' }} size={Sizes.normal}>{isReady ? '' : 'Connecting...'}</SText>
     </View>),
-        headerStyle: { backgroundColor: '#161616' },
+        headerStyle: { backgroundColor: Colors.lightBlack },
         headerBackTitleVisible: false,
-        headerTitleStyle: { color: Colors.white },
+        headerTitleStyle: { color: Colors.light },
         headerShadowVisible: false,
         headerBlurEffect: 'dark',
         title: 'Forum'
@@ -45,7 +45,7 @@ export default function Chat() {
         // ),
       }}
       />
-      <View style={{ flex: 1, backgroundColor: Colors.dark, gap: 10 }}>
+      <View style={{ flex: 1, backgroundColor: Colors.black, gap: 10 }}>
       
         <FlatList
           data={Array.from(groups) || []}
@@ -53,6 +53,8 @@ export default function Chat() {
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{ paddingBottom: insets.bottom + 70, gap: 10 }}
           style={{ paddingTop: 15, paddingHorizontal: 20, flex: 1 }}
+          refreshing={!isReady}
+          onRefresh={() => ws?.close()}
         />
       </View>
     </>

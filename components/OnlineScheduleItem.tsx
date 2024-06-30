@@ -45,19 +45,19 @@ const OnlineScheduleItem = ({lesson}:IProps) => {
 
 
   return (
-    <View style={{ backgroundColor: '#161616', padding: 20, borderRadius: 30, gap:10}}>
-    <View style={{ flexDirection: 'row', flex:1 }}>
+    <View style={{ backgroundColor: Colors.dark, padding: 20, borderRadius: 30, gap:1}}>
+    <View style={{ flexDirection: 'row', flex:1, gap:10 }}>
         <View style={{ flexShrink: 1, flex:1}}>
-            <SText size={Sizes.bold} textStyle={{ color: Colors.white, fontSize: 16, marginBottom: 10 }}>{lesson.title ? lesson.title : 'Без названия'}</SText>
+            <SText size={Sizes.bold} textStyle={{ color: Colors.light, fontSize: 16, marginBottom: 10 }}>{lesson.title ? lesson.title : 'Без названия'}</SText>
         </View>
         <View>
-            <SText size={Sizes.bold} textStyle={{ color: Colors.white, fontSize: 16 }}>{dayjs(lesson.beginDate).format('HH:mm')}</SText>
-            <SText size={Sizes.normal} textStyle={{ color: Colors.white, fontSize: 14 }}>{dayjs(lesson.endDate).format('HH:mm')}</SText>
+            <SText size={Sizes.bold} textStyle={{ color: Colors.light, fontSize: 16 }}>{dayjs(lesson.beginDate).format('HH:mm')}</SText>
+            <SText size={Sizes.normal} textStyle={{ color: Colors.lightGrey, fontSize: 14 }}>{dayjs(lesson.endDate).format('HH:mm')}</SText>
         </View>
     </View>
     <View>
         < View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-            <SText size={Sizes.normal} textStyle={{ color: Colors.white, fontSize: 14 }}>{String(lesson.shedTypeName)}</SText>
+            <SText size={Sizes.normal} textStyle={{ color: Colors.darkGrey, fontSize: 14 }}>{String(lesson.shedTypeName)}</SText>
             <View style={{ backgroundColor: contTypeColors[lesson.typeId], paddingVertical: 5, paddingHorizontal: 10, borderRadius: 15 }}>
                 <SText size={Sizes.normal} textStyle={{ color: Colors.dark }}>{lessonTypes[lesson.typeId]}</SText>
             </View>
@@ -65,8 +65,8 @@ const OnlineScheduleItem = ({lesson}:IProps) => {
         </View >
     </View>
     <View>
-        <TouchableOpacity onPress={() => getLink(lesson.hash)} style={{backgroundColor: Colors.dark, marginTop:10, padding:loading ? 12 : 15, borderRadius:18}}>
-            {loading ? <ActivityIndicator size={'small'}/> : <SText textStyle={{textAlign:'center', color:Colors.white}} size={Sizes.normal}>Enter</SText>}
+        <TouchableOpacity onPress={() => getLink(lesson.hash)} style={{backgroundColor: Colors.black, marginTop:10, padding:loading ? 12 : 15, borderRadius:18}}>
+            {loading ? <ActivityIndicator size={'small'}/> : <SText textStyle={{textAlign:'center', color:Colors.light}} size={Sizes.normal}>Enter</SText>}
         </TouchableOpacity>
     </View>
 </View>

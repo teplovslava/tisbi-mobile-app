@@ -35,9 +35,9 @@ const SmallCalendar = () => {
                     onPress={() => dispatch(setDate(day))}
                     activeOpacity={0.7}
                     style={{ justifyContent: 'center', alignItems: 'center', gap: 5 }}>
-                    <SText size={Sizes.normal} textStyle={{ color: Colors.grey, fontSize: 18 }}>{daysName[dayjs(day).day()]}</SText>
-                    <View style={{ backgroundColor: day === currentDate ? '#6b99c3' : '#161616', padding: 12, borderRadius: 16 }}>
-                        <SText size={Sizes.normal} textStyle={{ color: Colors.white, fontSize: 16 }}>{dayjs(day).format('DD')}</SText>
+                    <SText size={Sizes.normal} textStyle={{ color: Colors.lightGrey, fontSize: 18 }}>{daysName[dayjs(day).day()]}</SText>
+                    <View style={{ backgroundColor: day === currentDate ? Colors.main : '#161616', padding: 12, borderRadius: 16 }}>
+                        <SText size={Sizes.normal} textStyle={{ color: Colors.light, fontSize: 16 }}>{dayjs(day).format('DD')}</SText>
                     </View>
                 </TouchableOpacity>
             )

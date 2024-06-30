@@ -13,6 +13,7 @@ import {
 
 import {useCalendar} from '../DatePicker';
 import { AntDesign } from '@expo/vector-icons';
+import Colors from '@/constants/Colors';
 
 const SelectMonth = () => {
   const {
@@ -113,7 +114,7 @@ const SelectMonth = () => {
           activeOpacity={0.7}
           style={style.arrowWrapper}
           onPress={() => !nextDisable && onSelectYear(-1)}>
-          <AntDesign name="left" size={16} color="#6b99c3" />
+          <AntDesign name="left" size={16} color={Colors.main} />
         </TouchableOpacity>
         <TextInput
           style={style.yearInput}
@@ -132,7 +133,7 @@ const SelectMonth = () => {
           activeOpacity={0.7}
           style={style.arrowWrapper}
           onPress={() => !prevDisable && onSelectYear(+1)}>
-          <AntDesign name="right" size={16} color="#6b99c3" />
+          <AntDesign name="right" size={16} color={Colors.main} />
         </TouchableOpacity>
       </View>
 
@@ -197,7 +198,7 @@ const styles = theme =>
       alignItems: 'center',
     },
     selectedItem: {
-      backgroundColor: '#6b99c3',
+      backgroundColor: Colors.main,
       borderRadius: 12,
     },
     itemText: {
