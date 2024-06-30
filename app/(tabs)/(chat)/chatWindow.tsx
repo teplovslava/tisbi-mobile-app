@@ -25,7 +25,6 @@ import { normalizeAnsweredMessage } from '@/service/normalizeAnsweredMessage'
 import { FileView } from '@/ui/File'
 import dayjs from 'dayjs'
 import * as Clipboard from 'expo-clipboard';
-import ChatSceleton from '@/ui/chatSceleton'
 
 
 
