@@ -26,7 +26,7 @@ const TabBar = (props: IProps) => {
   const segments = useSegments();
 
   // if screen is in the home or live stack, hide the tab bar
-  const hide = segments.includes("chatWindow" as never)
+  const hide = segments.includes("chatWindow" as never) || segments.includes("videoCall" as never)
 
   const bottomStyle = useAnimatedStyle(() => {
     return {

@@ -12,6 +12,9 @@ import { normalizeAnsweredMessage } from '@/service/normalizeAnsweredMessage'
 import { FontAwesome } from '@expo/vector-icons';
 import { FileView } from './File'
 import { LinearGradient } from 'expo-linear-gradient'
+import OpenGraphMarkup from './openGrapMarkup'
+
+
 
 
 interface IProps {
@@ -37,6 +40,9 @@ const urlRegex = /(https?:\/\/[^\s]+)/g;
 const ChatMessage = ({ newDate, samePrev, sameNext, message,isMyMessage, setMessageAndBelt, handleLongPress, isChooseMode, setChoosedMessage, isChoosed, onQuotaClick, scrolledMessage }: IProps) => {
 
     const parts = message.Msg.split(urlRegex);
+
+    const match = message.Msg.match(urlRegex)
+
 
     const isChanged = message.DateEdit &&  message.DateAdd !== message.DateEdit
 
@@ -252,6 +258,7 @@ const ChatMessage = ({ newDate, samePrev, sameNext, message,isMyMessage, setMess
                                 {message.Msg &&
                                 <SText>
                                     {
+                                        
                                         parts.map((part, index) => {
                                             if (urlRegex.test(part)) {
                                               return (
@@ -272,6 +279,10 @@ const ChatMessage = ({ newDate, samePrev, sameNext, message,isMyMessage, setMess
 
                                 {message.AttachmentInfo && <View style={{gap:3, width:'100%'}}>
                                     {files.map((file: string, i: number) => file.length ? <FileView key={i} isChooseMode={isChooseMode} file={file} /> : null)}
+                                    </View>}
+
+                                {match?.length && <View style={{width:'100%'}}>
+                                    <OpenGraphMarkup url={match[0]}/>
                                     </View>}
                                 <SText size={Sizes.normal} textStyle={{ fontSize: 10, color: isMyMessage ? 'white' : '#6C6C6C', marginRight:isMyMessage ? -5 : 0, marginLeft: isMyMessage ? 0 : -5 }}>{isChanged ? 'изменено' : ''} {DateEdit ? DateEdit : DateAdd}</SText>
                                 </LinearGradient>

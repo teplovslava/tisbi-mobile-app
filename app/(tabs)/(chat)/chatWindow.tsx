@@ -128,10 +128,11 @@ const chatWindow = () => {
             flatListRef.current?.scrollToIndex({ animated: true, index: 0 })
         }
         setEditMode(false)
-    },[])
+    }, [])
 
 
     const sendMessage = useCallback((message: string) => {
+
         if (message.trim()) {
             currentMessage.current = message
             ws?.send(JSON.stringify({
@@ -145,7 +146,7 @@ const chatWindow = () => {
             setChoosedMessage([])
             flatListRef.current?.scrollToIndex({ animated: true, index: 0 })
         }
-    },[])
+    }, [ws])
 
     const deleteMessage = () => {
         actionListPosition.value = {
@@ -337,7 +338,7 @@ const chatWindow = () => {
         openKeyboard()
     }
 
-    const setMessageAndBelt = useCallback((message:IMessage) => {
+    const setMessageAndBelt = useCallback((message: IMessage) => {
         openKeyboard()
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy)
         setChoosedMessage([{
@@ -362,7 +363,7 @@ const chatWindow = () => {
                 MsgSourceID: message.ID
             })
         }
-    },[])
+    }, [])
 
     // add messages to answer when choose mode is true
     const addMessagesToAnswer = () => {
@@ -383,7 +384,7 @@ const chatWindow = () => {
 
     const reversedMessages = useMemo(() => {
         return messages ? [...messages].reverse() : [];
-      }, [messages]);
+    }, [messages]);
 
     const clearAnsweredMessages = () => {
         setChoosedMessage([])
@@ -496,23 +497,23 @@ const chatWindow = () => {
             func: () => chooseModeOn()
         },
         {
-            name:'COPYTEXT',
-            private:false,
-            title:'Скопировать',
+            name: 'COPYTEXT',
+            private: false,
+            title: 'Скопировать',
             icon: <Feather name="copy" size={20} color="black" />,
-            color:'black',
-            func:() => copyMessageText()
+            color: 'black',
+            func: () => copyMessageText()
         }
     ]
 
 
-    const renderItem = useCallback(({ item, index } : {item : IMessage, index: number}) => {
-        
-        const prevItem = index >= 0 ? messages ? messages[messages?.length - index - 2 ] : null : null;
+    const renderItem = useCallback(({ item, index }: { item: IMessage, index: number }) => {
+
+        const prevItem = index >= 0 ? messages ? messages[messages?.length - index - 2] : null : null;
         const nextItem = index >= 0 ? messages ? messages[messages?.length - index] : null : null;
 
-        const prevDate = prevItem ?  dayjs(prevItem.DateAdd).format(`DD MMMM`) : null
-        const nextDate = nextItem ?  dayjs(nextItem.DateAdd).format(`DD MMMM`) : null
+        const prevDate = prevItem ? dayjs(prevItem.DateAdd).format(`DD MMMM`) : null
+        const nextDate = nextItem ? dayjs(nextItem.DateAdd).format(`DD MMMM`) : null
         const todayDate = dayjs(item.DateAdd).format(`DD MMMM`)
 
         const newDate = prevDate !== todayDate ? true : false
@@ -522,7 +523,7 @@ const chatWindow = () => {
 
         if (item.Status === 2 || item.Status === 3) {
             return <ChatMessage
-                newDate = {newDate}
+                newDate={newDate}
                 samePrev={prevItem?.PeopleRoleID === item.PeopleRoleID && !newDate}
                 sameNext={nextItem?.PeopleRoleID === item.PeopleRoleID && !newDateNext}
                 setMessageAndBelt={setMessageAndBelt}
@@ -537,9 +538,13 @@ const chatWindow = () => {
 
             />
         } else if (item.Status === 4) {
-            return <DeletedMessage message={item} />
+            return <DeletedMessage
+                samePrev={prevItem?.PeopleRoleID === item.PeopleRoleID && !newDate}
+                sameNext={nextItem?.PeopleRoleID === item.PeopleRoleID && !newDateNext}
+                message={item}
+                isMyMessage={isMyMessage} />
         } else return null
-    }, [messages, scrolledMessageID, isChooseMode,choosedMessage]);
+    }, [messages, scrolledMessageID, isChooseMode, choosedMessage]);
 
     return (
         <View style={{ flex: 1, backgroundColor: Colors.black }}>
@@ -568,8 +573,8 @@ const chatWindow = () => {
 
                                 {currentPressedMessage?.message.AttachmentInfo && currentPressedMessage?.message.AttachmentInfo?.split(';').map((file: string, i: number) => file.length ? <FileView key={i} isChooseMode={isChooseMode} file={file} /> : null)}
                             </View> */}
-                                
-                            
+
+
                             {
                                 actionList.map((item) => {
 
@@ -591,7 +596,7 @@ const chatWindow = () => {
 
                 headerShown: true,
                 headerTitleAlign: 'center',
-                headerTitle: (props) => (<View style={{ flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: 230 }}>
+                headerTitle: (props) => (<View style={{ flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: 200 }}>
                     <SText numberOfLines={1} textStyle={{ fontSize: 18, color: Colors.light, width: '100%', }} size={Sizes.normal}>{chat.length ? chat[0].chat.GroupName : ''}</SText>
                     <SText numberOfLines={1} textStyle={{ fontSize: 12, color: Colors.lightGrey, width: '100%', textAlign: 'center' }} size={Sizes.normal}>{chat.length ? isReady ? loading ? 'Обновление...' : chat[0].chat.ChatName : 'Connecting...' : ''}</SText>
                 </View>),
@@ -602,20 +607,31 @@ const chatWindow = () => {
                 headerBackVisible: false,
                 headerBlurEffect: 'dark',
                 headerRight: (props) => (
-                    <TouchableOpacity onPress={() => {
-                        Keyboard.dismiss()
-                        onlineUserBottomSheetRef.current?.collapse()
-                    }}>
-                        <Feather name="more-horizontal" size={30} color="white" />
-                    </TouchableOpacity>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+                        {/* <TouchableOpacity onPress={() => {
+                            router.push({pathname: '/(tabs)/(chat)/videoCall', params:{id: JSON.stringify(id)}})
+                        }}>
+                            <Ionicons name="videocam-outline" size={30} color="white" />
+                        </TouchableOpacity> */}
+                        <TouchableOpacity onPress={() => {
+                            Keyboard.dismiss()
+                            onlineUserBottomSheetRef.current?.collapse()
+                        }}>
+                            <Feather name="more-horizontal" size={30} color="white" />
+                        </TouchableOpacity>
+                    </View>
                 ),
                 headerLeft: (props) => (
-                    <TouchableOpacity onPress={() => {
-                        router.back()
-                        
-                    }} {...props}>
-                        <Ionicons name="chevron-back-outline" size={28} color={Colors.main} />
-                    </TouchableOpacity>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+                        <TouchableOpacity onPress={() => {
+                            router.back()
+
+                        }} {...props}>
+                            <Ionicons name="chevron-back-outline" size={28} color={Colors.main} />
+                        </TouchableOpacity>
+                        {/* <View style={{width:30}}></View> */}
+                    </View>
+
                 ),
             }}
             />
@@ -629,49 +645,49 @@ const chatWindow = () => {
                             ? <View style={{ backgroundColor: Colors.black, flex: 1, flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
                                 <Loader />
                             </View>
-                            : 
-                            chat.length ? 
-                            Boolean(messages?.length)
-                                ? <View style={{ backgroundColor: Colors.lightBlack, flex: 1 }}>
-                                    {
-                                        history?.fixed && <TouchableOpacity onPress={() => scrollToMessage(history?.fixed.ID)} style={{ borderTopColor: 'black', borderTopWidth: 1, padding: 15, paddingVertical: 5, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 10 }}>
-                                            <AntDesign style={{ flexGrow: 0, flexShrink: 0 }} name="pushpino" size={20} color={Colors.light} />
-                                            <View style={{ flex: 1 }}>
-                                                <SText textStyle={{ color: Colors.lightGrey, fontSize: 14, marginBottom: 5 }}>Закрепленное сообщение</SText>
-                                                <SText size={Sizes.normal} numberOfLines={1} textStyle={{ color: Colors.light, fontSize: 16 }}>{history?.fixed.Msg}</SText>
-                                            </View>
-                                            <TouchableOpacity onPress={() => unfixMessage(history?.fixed)} style={{ flexGrow: 0, flexShrink: 0 }}>
-                                                <AntDesign name="close" size={20} color={Colors.lightGrey} />
+                            :
+                            chat.length ?
+                                Boolean(messages?.length)
+                                    ? <View style={{ backgroundColor: Colors.lightBlack, flex: 1 }}>
+                                        {
+                                            history?.fixed && <TouchableOpacity onPress={() => scrollToMessage(history?.fixed.ID)} style={{ borderTopColor: 'black', borderTopWidth: 1, padding: 15, paddingVertical: 5, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 10 }}>
+                                                <AntDesign style={{ flexGrow: 0, flexShrink: 0 }} name="pushpino" size={20} color={Colors.light} />
+                                                <View style={{ flex: 1 }}>
+                                                    <SText textStyle={{ color: Colors.lightGrey, fontSize: 14, marginBottom: 5 }}>Закрепленное сообщение</SText>
+                                                    <SText size={Sizes.normal} numberOfLines={1} textStyle={{ color: Colors.light, fontSize: 16 }}>{history?.fixed.Msg}</SText>
+                                                </View>
+                                                <TouchableOpacity onPress={() => unfixMessage(history?.fixed)} style={{ flexGrow: 0, flexShrink: 0 }}>
+                                                    <AntDesign name="close" size={20} color={Colors.lightGrey} />
+                                                </TouchableOpacity>
                                             </TouchableOpacity>
-                                        </TouchableOpacity>
-                                    }
-                                    <FlatList
-                                        ref={flatListRef}
-                                        keyboardDismissMode='interactive'
-                                        onEndReached={() => getOldMessages(messages)}
-                                        onEndReachedThreshold={0.9}
-                                        onScrollToIndexFailed={() => { }}
-                                        inverted
-                                        contentContainerStyle={{ padding: 15, flexDirection: 'column', }}
-                                        style={{ backgroundColor: Colors.black }}
-                                        removeClippedSubviews={true}
-                                        data={reversedMessages}
-                                        initialNumToRender={20}
-                                        maxToRenderPerBatch={5}
-                                        keyExtractor={item => item.ID.toString()}
-                                        renderItem={renderItem}
-                                        ListFooterComponent={() => {
-                                            return messages && Number(messages[0]?.RowNum) - 1 > 1 ? <SText textStyle={{ textAlign: 'center', color: 'white' }}>Загрузка...</SText> : null
+                                        }
+                                        <FlatList
+                                            ref={flatListRef}
+                                            keyboardDismissMode='interactive'
+                                            onEndReached={() => getOldMessages(messages)}
+                                            onEndReachedThreshold={0.9}
+                                            onScrollToIndexFailed={() => { }}
+                                            inverted
+                                            contentContainerStyle={{ padding: 15, flexDirection: 'column', }}
+                                            style={{ backgroundColor: Colors.black }}
+                                            removeClippedSubviews={true}
+                                            data={reversedMessages}
+                                            initialNumToRender={20}
+                                            maxToRenderPerBatch={5}
+                                            keyExtractor={item => item.ID.toString()}
+                                            renderItem={renderItem}
+                                            ListFooterComponent={() => {
+                                                return messages && Number(messages[0]?.RowNum) - 1 > 1 ? <SText textStyle={{ textAlign: 'center', color: 'white' }}>Загрузка...</SText> : null
 
-                                        }}
-                                    />
-                                </View>
+                                            }}
+                                        />
+                                    </View>
+                                    : <View style={{ backgroundColor: Colors.black, flex: 1, flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+                                        <SText size={Sizes.bold} textStyle={{ color: Colors.light, fontSize: 16 }}>Сообщений пока нет</SText>
+                                    </View>
                                 : <View style={{ backgroundColor: Colors.black, flex: 1, flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-                                    <SText size={Sizes.bold} textStyle={{ color: Colors.light, fontSize: 16 }}>Сообщений пока нет</SText>
+                                    <SText size={Sizes.bold} textStyle={{ color: Colors.light, fontSize: 16 }}>Чат устарел или не существует</SText>
                                 </View>
-                                : <View style={{ backgroundColor: Colors.black, flex: 1, flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-                                <SText size={Sizes.bold} textStyle={{ color: Colors.light, fontSize: 16 }}>Чат устарел или не существует</SText>
-                            </View>
                     }
                     <Animated.View style={answeredMessageStyle}>
                         <AnsweredMessage choosedMessage={choosedMessage} clearAnsweredMessages={clearAnsweredMessages} />
@@ -731,15 +747,15 @@ const chatWindow = () => {
                     style={{ borderRadius: 40, overflow: "hidden", backgroundColor: Colors.lightBlack }}
                     containerStyle={{ borderRadius: 40 }}
                     backdropComponent={(props: any) => (
-                        <Backdrop children={ <BlurView intensity={10} style={{flex:1, width:'100%', height:'100%'}}/>}  {...props} opacity={0.8} disappearsOnIndex={-1} appearsOnIndex={0} >
-                           
+                        <Backdrop children={<BlurView intensity={10} style={{ flex: 1, width: '100%', height: '100%' }} />}  {...props} opacity={0.8} disappearsOnIndex={-1} appearsOnIndex={0} >
+
                         </Backdrop>)}
                     handleIndicatorStyle={{}}>
                     <BottomSheetView>
                         <OnlineUsers isHalfExpanded={isHalfExpanded} ref={onlineUserBottomSheetRef} />
                     </BottomSheetView>
                 </BottomSheet>
-            
+
 
             </GestureHandlerRootView>
 

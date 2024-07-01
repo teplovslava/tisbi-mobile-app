@@ -58,8 +58,8 @@ export const WebsocketProvider = ({ children, token }: IProps) => {
 
         socket.onmessage = (event) => {
             const value = JSON.parse(event.data)
-
             switch (value.type) {
+
                 case 'member-list':
                     setMember(value)
                     break;
