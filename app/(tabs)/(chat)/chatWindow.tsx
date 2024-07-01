@@ -9,7 +9,7 @@ import { GestureHandlerRootView, TextInput } from 'react-native-gesture-handler'
 import ChatInput from '@/ui/chatInput'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import ChatMessage from '@/ui/chatMessage'
-import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated'
+import Animated, { FlipInXUp, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated'
 import { BlurView } from 'expo-blur'
 import Loader from '@/components/Loader'
 import * as Haptics from 'expo-haptics';
@@ -25,6 +25,7 @@ import { normalizeAnsweredMessage } from '@/service/normalizeAnsweredMessage'
 import { FileView } from '@/ui/File'
 import dayjs from 'dayjs'
 import * as Clipboard from 'expo-clipboard';
+import ChatActivityInfo from '@/ui/chatActivityInfo'
 
 
 
@@ -596,9 +597,10 @@ const chatWindow = () => {
 
                 headerShown: true,
                 headerTitleAlign: 'center',
-                headerTitle: (props) => (<View style={{ flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: 200 }}>
+                headerTitle: (props) => (<View style={{ flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: 230 }}>
                     <SText numberOfLines={1} textStyle={{ fontSize: 18, color: Colors.light, width: '100%', }} size={Sizes.normal}>{chat.length ? chat[0].chat.GroupName : ''}</SText>
-                    <SText numberOfLines={1} textStyle={{ fontSize: 12, color: Colors.lightGrey, width: '100%', textAlign: 'center' }} size={Sizes.normal}>{chat.length ? isReady ? loading ? 'Обновление...' : chat[0].chat.ChatName : 'Connecting...' : ''}</SText>
+                    <ChatActivityInfo length={chat.length} name={chat[0].chat.ChatName} isReady={isReady} loading={loading}/>
+
                 </View>),
                 headerStyle: { backgroundColor: Colors.lightBlack },
                 headerTitleStyle: { color: Colors.light },

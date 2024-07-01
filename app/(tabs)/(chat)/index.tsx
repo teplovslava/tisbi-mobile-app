@@ -7,6 +7,7 @@ import { Stack, router } from 'expo-router'
 import SText, { Sizes } from '@/components/StyledText'
 import ChatGroup from '@/ui/chatGroup'
 import { normalizeGroup } from '@/service/groupsNormalize'
+import ChatActivityInfo from '@/ui/chatActivityInfo'
 
 export default function Chat() {
   const insets = useSafeAreaInsets()
@@ -28,9 +29,9 @@ export default function Chat() {
         headerBackButtonMenuEnabled: false,
         headerBackVisible: false,
         headerTitleAlign: 'center',
-        headerTitle: (props) => (<View style={{ flexDirection: 'column', alignItems: 'center', justifyContent: 'center'}}>
+        headerTitle: (props) => (<View style={{ flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width:230}}>
         <SText numberOfLines={1} textStyle={{ fontSize: 18, color: Colors.light, textAlign:'center' }} size={Sizes.normal}>Forum</SText>
-        <SText numberOfLines={1} textStyle={{ fontSize: 12, color: '#505050', width: '100%', textAlign: 'center' }} size={Sizes.normal}>{isReady ? '' : 'Connecting...'}</SText>
+        <ChatActivityInfo length={1} name={''} isReady={isReady} loading={false}/>
     </View>),
         headerStyle: { backgroundColor: Colors.lightBlack },
         headerBackTitleVisible: false,

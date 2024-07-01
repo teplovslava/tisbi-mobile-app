@@ -7,6 +7,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { WebsocketContext } from '@/context/WebSocketContext'
 import ChatList from '@/ui/chatList'
 import { Ionicons } from '@expo/vector-icons'
+import ChatActivityInfo from '@/ui/chatActivityInfo'
 
 const ChatsList = () => {
   const insets = useSafeAreaInsets()
@@ -24,9 +25,9 @@ const ChatsList = () => {
       <Stack.Screen options={{
         headerShown: true,
         headerTitleAlign: 'center',
-        headerTitle: (props) => (<View style={{ flexDirection: 'column', alignItems: 'center', justifyContent: 'center'}}>
-        <SText numberOfLines={1} textStyle={{ fontSize: 18, color: Colors.light, textAlign:'center', width:260 }} size={Sizes.normal}>{name ? name : 'Без названия'}</SText>
-        <SText numberOfLines={1} textStyle={{ fontSize: 12, color: '#505050', width: '100%', textAlign: 'center' }} size={Sizes.normal}>{isReady ? '' : 'Connecting...'}</SText>
+        headerTitle: (props) => (<View style={{ flexDirection: 'column', alignItems: 'center', justifyContent: 'center',width:230}}>
+        <SText numberOfLines={1} textStyle={{ fontSize: 18, color: Colors.light, textAlign:'center' }} size={Sizes.normal}>{name ? name : 'Без названия'}</SText>
+        <ChatActivityInfo length={1} name={''} isReady={isReady} loading={false}/>
     </View>),
         headerStyle: { backgroundColor: Colors.lightBlack },
         headerTitleStyle: { color: Colors.light },
