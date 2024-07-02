@@ -13,6 +13,8 @@ import { FontAwesome } from '@expo/vector-icons';
 import { FileView } from './File'
 import { LinearGradient } from 'expo-linear-gradient'
 import OpenGraphMarkup from './openGrapMarkup'
+import { LangContext } from '@/context/LanguageContext'
+import 'dayjs/locale/ru'
 
 
 
@@ -42,6 +44,7 @@ const ChatMessage = ({ newDate, samePrev, sameNext, message,isMyMessage, setMess
     const parts = message.Msg.split(urlRegex);
 
     const match = message.Msg.match(urlRegex)
+    const currLang = useContext(LangContext)
 
 
     const isChanged = message.DateEdit &&  message.DateAdd !== message.DateEdit
@@ -54,6 +57,7 @@ const ChatMessage = ({ newDate, samePrev, sameNext, message,isMyMessage, setMess
     const isBelt = useSharedValue(false);
     const isChoosedMessage = useSharedValue(false)
 
+    const newDateFormated = currLang?.lang === 'Русский' ? dayjs(message.DateAdd).locale('ru').format(`DD MMMM`) : dayjs(message.DateAdd).format(`DD MMMM`)
 
 
     const drag = Gesture.Pan()
@@ -256,7 +260,7 @@ const ChatMessage = ({ newDate, samePrev, sameNext, message,isMyMessage, setMess
                                     </View>
                                 }
                                 {message.Msg &&
-                                <SText>
+                                <SText textStyle={{lineHeight:16}}>
                                     {
                                         
                                         parts.map((part, index) => {
@@ -294,7 +298,7 @@ const ChatMessage = ({ newDate, samePrev, sameNext, message,isMyMessage, setMess
                 </TouchableOpacity>
             </GestureDetector>
             {
-                newDate && <SText textStyle={{ color: Colors.light, marginVertical:30, textAlign:'center' }}>{dayjs(message.DateAdd).format(`DD MMMM`)}</SText>
+                newDate && <SText textStyle={{ color: Colors.light, marginVertical:30, textAlign:'center' }}>{newDateFormated}</SText>
             }
         </>
     )

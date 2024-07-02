@@ -9,7 +9,7 @@ import { GestureHandlerRootView, TextInput } from 'react-native-gesture-handler'
 import ChatInput from '@/ui/chatInput'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import ChatMessage from '@/ui/chatMessage'
-import Animated, { FlipInXUp, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated'
+import Animated, { FlipInXUp, useAnimatedStyle, useSharedValue, withDelay, withTiming } from 'react-native-reanimated'
 import { BlurView } from 'expo-blur'
 import Loader from '@/components/Loader'
 import * as Haptics from 'expo-haptics';
@@ -71,11 +71,10 @@ const chatWindow = () => {
 
     const { id } = useLocalSearchParams()
     const chatId = JSON.parse(id as string)
-    const chat = chatList?.chats?.filter((chatItem: IChat) => String(chatItem.chat.ID) === id) || []
+    const chat = chatList?.chats?.filter((chatItem: IChat) => String(chatItem?.chat?.ID) === id) || []
 
 
     const scrollToMessage = useCallback((id: string) => {
-        setScrolledMessageID(null)
         const idx = messagesRef?.current?.findIndex((message) => String(message.ID) === String(id));
 
         if (timerRef.current) {
@@ -201,7 +200,7 @@ const chatWindow = () => {
 
     const answeredMessageStyle = useAnimatedStyle(() => {
         return {
-            maxHeight: withTiming(choosedMessage.length && !isChooseMode ? 100 : 0),
+            maxHeight: withTiming(choosedMessage.length && !isChooseMode ? 100 : 0)
             // paddingVertical:withTiming(choosedMessage.length && !isChooseMode ? 10 : 0),
         }
     })

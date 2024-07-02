@@ -21,7 +21,16 @@ export default {
         'October':'Октября',
         'November':'Ноября',
         'December':'Декабря',
-        'No lessons':'Нет занятий'
+        'No lessons':'Нет занятий',
+        'Schedule':'Расписание',
+        'Forum':'Форум',
+        'All':'Все',
+        'Online':'В сети',
+        'Offline':'Не в сети',
+        'Студент':'Студент',
+        'Преподаватель': 'Преподаватель',
+        'Обновление...':'Обновление...',
+        'Подключение...': 'Подключение...'
     }, 
     eng:{
         'Enter': 'Enter',
@@ -32,6 +41,15 @@ export default {
         'Language':'Language',
         'Settings': 'Settings',
         'Choose language':'Choose language',
-        'Online lessons':'Online lessons'
+        'Online lessons':'Online lessons',
+        'Schedule':'Schedule',
+        'Forum':'Forum',
+        'All':'All',
+        'Online':'Online',
+        'Offline':'Offline',
+        'Студент':'Student',
+        'Преподаватель': 'Teacher',
+        'Обновление...':'Updating...',
+        'Подключение...': 'Connecting...'
     }
 }

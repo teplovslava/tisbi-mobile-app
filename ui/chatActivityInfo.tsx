@@ -1,3 +1,4 @@
+import SText, { Sizes } from '@/components/StyledText';
 import Colors from '@/constants/Colors';
 import React, { memo, useEffect, useState } from 'react';
 import { Text, View } from 'react-native';
@@ -8,44 +9,38 @@ const ChatActivityInfo = ({ length, name, isReady, loading }: { length: number, 
     return (
         <View style={{
             flexDirection: "column",
-            width:'100%'
+            width: '100%'
         }}>
-            {length && isReady && loading && 
-            <Animated.Text
-            entering={FadeInUp.delay(300)}
-            exiting={FadeOutUp.delay(300)}
-            numberOfLines={1}
-            style={{
-                fontFamily: 'GilroyRegular',
+            {length && isReady && loading &&
+                <Animated.View
+                    entering={FadeInUp.delay(300)}
+                    exiting={FadeOutUp.delay(300)}
+                ><SText numberOfLines={1} size={Sizes.normal} textStyle={{
+                    fontSize: 12,
+                    color: Colors.lightGrey,
+                    width: '100%',
+                    textAlign: 'center',
+                }}>Обновление...</SText></Animated.View>}
+
+            {length && isReady && !loading && <Animated.View
+                entering={FadeInUp.delay(300)}
+                exiting={FadeOutUp.delay(300)}
+            ><SText numberOfLines={1} size={Sizes.normal} textStyle={{
                 fontSize: 12,
                 color: Colors.lightGrey,
                 width: '100%',
                 textAlign: 'center',
-            }}>Обновление...</Animated.Text>}
+            }}>{name}</SText></Animated.View>}
 
-            {length && isReady && !loading && <Animated.Text
+            {length && !isReady && <Animated.View
                 entering={FadeInUp.delay(300)}
                 exiting={FadeOutUp.delay(300)}
-                numberOfLines={1}
-                style={{
-                    fontFamily: 'GilroyRegular',
-                    fontSize: 12,
-                    color: Colors.lightGrey,
-                    width: '100%',
-                    textAlign: 'center',
-                }}>{name}</Animated.Text>}
-
-            {length && !isReady && <Animated.Text
-                entering={FadeInUp.delay(300)}
-                exiting={FadeOutUp.delay(300)}
-                numberOfLines={1}
-                style={{
-                    fontFamily: 'GilroyRegular',
-                    fontSize: 12,
-                    color: Colors.lightGrey,
-                    width: '100%',
-                    textAlign: 'center',
-                }}>Подключение...</Animated.Text>}
+            ><SText numberOfLines={1} size={Sizes.normal} textStyle={{
+                fontSize: 12,
+                color: Colors.lightGrey,
+                width: '100%',
+                textAlign: 'center',
+            }}>Подключение...</SText></Animated.View>}
         </View>
     );
 };

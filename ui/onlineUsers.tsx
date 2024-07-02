@@ -8,6 +8,7 @@ import { AntDesign, Feather } from '@expo/vector-icons'
 import SText, { Sizes } from '@/components/StyledText'
 import Colors from '@/constants/Colors'
 import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated'
+import { LangContext } from '@/context/LanguageContext'
 
 const OnlineUsers = (props: any, ref: any) => {
 
@@ -17,6 +18,7 @@ const OnlineUsers = (props: any, ref: any) => {
     const ws = socket?.ws
     const connectedMembers = socket?.connectedMembers
     const member = socket?.member
+    const currLang = useContext(LangContext)
 
 
     const leftPosValue = useSharedValue(5)
@@ -44,7 +46,7 @@ const OnlineUsers = (props: any, ref: any) => {
         });
     };
 
-    const elements = ['Все', 'Онлайн', 'Оффлайн'];
+    const elements = currLang?.lang === 'Русский' ?['Все', 'В сети', 'Не в сети'] : ['All', 'Online', 'Offline'];
 
     const animatedStyle = useAnimatedStyle(() => ({
         left: leftPosValue.value,
@@ -105,7 +107,7 @@ const OnlineUsers = (props: any, ref: any) => {
             <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
                 <View style={{gap:7,padding: 10, marginBottom: 10, backgroundColor: Colors.black, borderRadius: 12, flexDirection:'row', alignItems:'center'}}>
                 <Feather name="search" size={14} color={Colors.darkGrey} />
-                <TextInput placeholderTextColor={Colors.darkGrey} placeholder='Поиск...' style={{  fontFamily: 'GilroyRegular', flex:1, color:Colors.light}} onFocus={() => ref?.current?.snapToIndex(1)} onChangeText={setValue}
+                <TextInput placeholderTextColor={Colors.darkGrey} placeholder={currLang?.lang === 'Русский' ? 'Поиск...' : 'Search...'} style={{  fontFamily: 'GilroyRegular', flex:1, color:Colors.light}} onFocus={() => ref?.current?.snapToIndex(1)} onChangeText={setValue}
                     value={value} onCancelled={() => ref?.current?.forceClose()} />
                 </View>
             </TouchableWithoutFeedback>
