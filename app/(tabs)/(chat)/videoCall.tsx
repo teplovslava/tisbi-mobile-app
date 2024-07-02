@@ -8,8 +8,9 @@ import SText from '@/components/StyledText'
 
 
 
+
 const VideoCall = () => {
-   
+
     return (
         <>
             <Stack.Screen
@@ -28,10 +29,8 @@ const VideoCall = () => {
                 }}
             />
             <View style={{ backgroundColor: Colors.black, flex: 1 }}>
-                <TouchableOpacity >
-                    <SText textStyle={{ color: Colors.light }}>Start</SText>
-                </TouchableOpacity>
-                
+
+
             </View>
 
         </>
