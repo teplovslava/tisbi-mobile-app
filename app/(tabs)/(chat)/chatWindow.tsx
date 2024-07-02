@@ -26,6 +26,7 @@ import { FileView } from '@/ui/File'
 import dayjs from 'dayjs'
 import * as Clipboard from 'expo-clipboard';
 import ChatActivityInfo from '@/ui/chatActivityInfo'
+import FixedMessage from '@/ui/fixedMessage'
 
 
 
@@ -175,8 +176,8 @@ const chatWindow = () => {
         ws?.send(JSON.stringify({
             type: 'msg-fixed',
             chatId: chatId,
-            msgId: message.ID,
-            msg: message.Msg,
+            msgId: message?.ID,
+            msg: message?.Msg,
             fix: 0
         }));
 
@@ -201,6 +202,13 @@ const chatWindow = () => {
     const answeredMessageStyle = useAnimatedStyle(() => {
         return {
             maxHeight: withTiming(choosedMessage.length && !isChooseMode ? 100 : 0)
+            // paddingVertical:withTiming(choosedMessage.length && !isChooseMode ? 10 : 0),
+        }
+    })
+
+    const fixedMessageStyle = useAnimatedStyle(() => {
+        return {
+            maxHeight: withTiming(history?.fixed ? 100 : 0)
             // paddingVertical:withTiming(choosedMessage.length && !isChooseMode ? 10 : 0),
         }
     })
@@ -650,18 +658,9 @@ const chatWindow = () => {
                             chat.length ?
                                 Boolean(messages?.length)
                                     ? <View style={{ backgroundColor: Colors.lightBlack, flex: 1 }}>
-                                        {
-                                            history?.fixed && <TouchableOpacity onPress={() => scrollToMessage(history?.fixed.ID)} style={{ borderTopColor: 'black', borderTopWidth: 1, padding: 15, paddingVertical: 5, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 10 }}>
-                                                <AntDesign style={{ flexGrow: 0, flexShrink: 0 }} name="pushpino" size={20} color={Colors.light} />
-                                                <View style={{ flex: 1 }}>
-                                                    <SText textStyle={{ color: Colors.lightGrey, fontSize: 14, marginBottom: 5 }}>Закрепленное сообщение</SText>
-                                                    <SText size={Sizes.normal} numberOfLines={1} textStyle={{ color: Colors.light, fontSize: 16 }}>{history?.fixed.Msg}</SText>
-                                                </View>
-                                                <TouchableOpacity onPress={() => unfixMessage(history?.fixed)} style={{ flexGrow: 0, flexShrink: 0 }}>
-                                                    <AntDesign name="close" size={20} color={Colors.lightGrey} />
-                                                </TouchableOpacity>
-                                            </TouchableOpacity>
-                                        }
+                                        <Animated.View style={fixedMessageStyle}>
+                                            <FixedMessage scrollToMessage={scrollToMessage} unfixMessage={unfixMessage} message={history?.fixed}/>
+                                        </Animated.View>
                                         <FlatList
                                             ref={flatListRef}
                                             keyboardDismissMode='interactive'
